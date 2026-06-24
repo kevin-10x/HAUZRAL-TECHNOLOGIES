@@ -1,0 +1,236 @@
+import express from "express";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import {
+  createContactSubmission,
+  db,
+  initializeDatabase,
+  listContactSubmissions,
+  upsertGoogleUser,
+} from "./db.js";
+
+const app = express();
+const port = process.env.PORT || 3000;
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const distPath = path.resolve(__dirname, "../dist");
+const appUrl = (process.env.APP_URL || `http://localhost:${port}`).replace(/\/$/, "");
+const googleClientId = process.env.GOOGLE_CLIENT_ID;
+const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
+const adminApiKey = process.env.ADMIN_API_KEY;
+
+app.disable("x-powered-by");
+app.set("trust proxy", 1);
+app.use(express.json({ limit: "100kb" }));
+
+function requireAdmin(req, res, next) {
+  if (!adminApiKey) {
+    return res.status(404).json({ error: "Not found" });
+  }
+
+  if (req.get("x-admin-api-key") !== adminApiKey) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  return next();
+}
+
+app.get("/api/health", async (_req, res) => {
+  if (!db) {
+    return res.json({
+      status: "ok",
+      service: "hauzral-technologies",
+      database: "not configured",
+    });
+  }
+
+  try {
+    await db.query("SELECT 1");
+    return res.json({
+      status: "ok",
+      service: "hauzral-technologies",
+      database: "connected",
+    });
+  } catch (error) {
+    return res.status(503).json({
+      status: "degraded",
+      service: "hauzral-technologies",
+      database: "unavailable",
+      error: error instanceof Error ? error.message : "Unknown database error",
+    });
+  }
+});
+
+app.post("/api/contact", async (req, res) => {
+  const name = String(req.body?.name ?? "").trim();
+  const email = String(req.body?.email ?? "").trim().toLowerCase();
+  const message = String(req.body?.message ?? "").trim();
+
+  if (!name || !email || !message) {
+    return res.status(400).json({
+      error: "name, email, and message are required",
+    });
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return res.status(400).json({
+      error: "Enter a valid email address",
+    });
+  }
+
+  if (message.length < 20) {
+    return res.status(400).json({
+      error: "Message should be at least 20 characters",
+    });
+  }
+
+  try {
+    const contact = await createContactSubmission({ name, email, message });
+
+    return res.status(202).json({
+      message: "Contact request stored",
+      contact,
+    });
+  } catch (error) {
+    return res.status(503).json({
+      error: "Could not store contact request",
+      details: error instanceof Error ? error.message : "Unknown database error",
+    });
+  }
+});
+
+app.get("/api/contact", requireAdmin, async (_req, res) => {
+  try {
+    const contacts = await listContactSubmissions();
+    return res.json({ contacts });
+  } catch (error) {
+    return res.status(503).json({
+      error: "Could not load contact requests",
+      details: error instanceof Error ? error.message : "Unknown database error",
+    });
+  }
+});
+
+app.get("/api/auth/signin", (_req, res) => {
+  res.json({
+    message: "Use /api/auth/google to sign in with Google.",
+  });
+});
+
+app.get("/api/auth/google", (_req, res) => {
+  if (!googleClientId) {
+    return res.status(501).json({
+      error: "Google sign-in is not configured.",
+      setup: "Set GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and APP_URL.",
+    });
+  }
+
+  const authUrl = new URL("https://accounts.google.com/o/oauth2/v2/auth");
+  authUrl.searchParams.set("client_id", googleClientId);
+  authUrl.searchParams.set("redirect_uri", `${appUrl}/api/auth/google/callback`);
+  authUrl.searchParams.set("response_type", "code");
+  authUrl.searchParams.set("scope", "openid email profile");
+  authUrl.searchParams.set("prompt", "select_account");
+
+  return res.redirect(authUrl.toString());
+});
+
+app.get("/api/auth/google/callback", async (req, res) => {
+  const { code } = req.query;
+
+  if (!googleClientId || !googleClientSecret) {
+    return res.status(501).json({
+      error: "Google sign-in is not configured.",
+      setup: "Set GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, and APP_URL.",
+    });
+  }
+
+  if (!code) {
+    return res.status(400).json({ error: "Missing Google authorization code." });
+  }
+
+  try {
+    const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: new URLSearchParams({
+        code: String(code),
+        client_id: googleClientId,
+        client_secret: googleClientSecret,
+        redirect_uri: `${appUrl}/api/auth/google/callback`,
+        grant_type: "authorization_code",
+      }),
+    });
+
+    const tokens = await tokenResponse.json();
+
+    if (!tokenResponse.ok) {
+      return res.status(502).json({
+        error: "Google token exchange failed.",
+        details: tokens,
+      });
+    }
+
+    const profileResponse = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+      headers: {
+        Authorization: `Bearer ${tokens.access_token}`,
+      },
+    });
+    const profile = await profileResponse.json();
+
+    if (!profileResponse.ok) {
+      return res.status(502).json({
+        error: "Google profile lookup failed.",
+        details: profile,
+      });
+    }
+
+    if (!profile.sub || !profile.email) {
+      return res.status(502).json({
+        error: "Google profile response was missing required identity fields.",
+      });
+    }
+
+    const user = await upsertGoogleUser(profile);
+
+    return res.json({
+      message: "Google sign-in successful.",
+      user,
+    });
+  } catch (error) {
+    return res.status(500).json({
+      error: "Google sign-in failed.",
+      details: error instanceof Error ? error.message : "Unknown error",
+    });
+  }
+});
+
+app.use(express.static(distPath));
+
+app.get("*", (_req, res) => {
+  res.sendFile(path.join(distPath, "index.html"));
+});
+
+const server = await initializeDatabase()
+  .then(() => {
+    return app.listen(port, () => {
+      console.log(`Hauzral app listening on port ${port}`);
+    });
+  })
+  .catch((error) => {
+    console.error("Failed to initialize database", error);
+    process.exit(1);
+  });
+
+function shutdown() {
+  server.close(async () => {
+    if (db) {
+      await db.end();
+    }
+    process.exit(0);
+  });
+}
+
+process.on("SIGTERM", shutdown);
+process.on("SIGINT", shutdown);

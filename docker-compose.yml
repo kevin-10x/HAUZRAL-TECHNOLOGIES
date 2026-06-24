@@ -1,0 +1,47 @@
+services:
+  hauzral-app:
+    build: .
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - APP_URL=http://localhost:3000
+      - DATABASE_URL=postgres://hauzral:hauzral_password@postgres:5432/hauzral
+      - DATABASE_SSL=false
+      - ADMIN_API_KEY=${ADMIN_API_KEY:-local-admin-key}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000/api/health').then((response) => process.exit(response.ok ? 0 : 1)).catch(() => process.exit(1))"
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_DB=hauzral
+      - POSTGRES_USER=hauzral
+      - POSTGRES_PASSWORD=hauzral_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hauzral -d hauzral"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres-data:
