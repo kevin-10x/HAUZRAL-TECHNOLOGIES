@@ -316,10 +316,10 @@ app.get("/api/auth/google/callback", async (req, res) => {
 
     const user = await upsertGoogleUser(profile);
 
-    return res.json({
-      message: state === "signup" ? "Google sign-up successful." : "Google sign-in successful.",
-      user,
-    });
+    const frontendUrl = process.env.CLIENT_URL || process.env.APP_URL || "http://localhost:3000";
+    const redirectPath = state === "signup" ? "/client-portal" : "/";
+
+    return res.redirect(`${frontendUrl}${redirectPath}`);
   } catch (error) {
     return res.status(500).json({
       error: "Google sign-in failed.",
