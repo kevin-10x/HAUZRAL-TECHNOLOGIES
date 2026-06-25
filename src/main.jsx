@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { createRoot } from "react-dom/client";
 import "./styles.css";
 
@@ -19,282 +19,18 @@ const services = [
 
 const projects = [
   {
-    repo: "kevin-10x/HAUZRALADAMAE",
-    title: "HAUZRALADAMAE",
-    visibility: "Public",
-    language: "HTML",
-    stars: 0,
-    forks: 0,
-    issues: 0,
-    watchers: 0,
-    updated: "Updated on Mar 24",
-    text: "A public web project connected to the Hauzral brand and digital agency presence.",
-    url: "https://github.com/kevin-10x/HAUZRALADAMAE",
+    title: "Northstar AI",
+    text: "Repositioned a B2B platform with a sharper narrative and flagship website.",
   },
   {
-    repo: "kevin-10x/portfolio-2-flask",
-    title: "portfolio-2-flask",
-    visibility: "Public",
-    language: "HTML",
-    stars: 0,
-    forks: 0,
-    issues: 0,
-    watchers: 0,
-    updated: "Updated 20 hours ago",
-    text: "A portfolio implementation that uses Flask to serve a personal web presence.",
-    url: "https://github.com/kevin-10x/portfolio-2-flask",
+    title: "Orchid Capital",
+    text: "Designed a polished investor experience that elevated credibility and trust.",
   },
   {
-    repo: "kevin-10x/KENYA-HIGHSCHOOL-MANAGEMENT-SYSTEM",
-    title: "KENYA-HIGHSCHOOL-MANAGEMENT-SYSTEM",
-    visibility: "Public",
-    language: "TypeScript",
-    stars: 0,
-    forks: 0,
-    issues: 0,
-    watchers: 0,
-    updated: "Updated on May 11",
-    text: "A school operations platform for managing academic and administrative workflows.",
-    url: "https://github.com/kevin-10x/KENYA-HIGHSCHOOL-MANAGEMENT-SYSTEM",
-  },
-  {
-    repo: "kevin-10x/FINTECH-START-UP",
-    title: "FINTECH-START-UP",
-    visibility: "Public",
-    language: "JavaScript",
-    stars: 0,
-    forks: 0,
-    issues: 0,
-    watchers: 0,
-    updated: "Updated on May 23",
-    text: "A strong FinTech and economy innovation set shaped from idea list toward startup-grade systems.",
-    url: "https://github.com/kevin-10x/FINTECH-START-UP",
-  },
-  {
-    repo: "kevin-10x/Agri-food",
-    title: "Agri-food",
-    visibility: "Public",
-    language: "JavaScript",
-    stars: 0,
-    forks: 0,
-    issues: 0,
-    watchers: 0,
-    updated: "Updated on May 23",
-    text: "A food and agriculture technology project focused on practical market systems.",
-    url: "https://github.com/kevin-10x/Agri-food",
-  },
-  {
-    repo: "kevin-10x/DELIVERY-SERVICES--ZRAL",
-    title: "DELIVERY-SERVICES--ZRAL",
-    visibility: "Public",
-    language: "JavaScript",
-    stars: 0,
-    forks: 0,
-    issues: 0,
-    watchers: 0,
-    updated: "Updated on Apr 15",
-    text: "A delivery services concept for logistics, ordering, and local fulfillment.",
-    url: "https://github.com/kevin-10x/DELIVERY-SERVICES--ZRAL",
-  },
-  {
-    repo: "kevin-10x/swahili-translator",
-    title: "swahili-translator",
-    visibility: "Public",
-    language: "Python",
-    stars: 0,
-    forks: 0,
-    issues: 0,
-    watchers: 0,
-    updated: "Updated yesterday",
-    text: "A language tool focused on Swahili translation and accessibility.",
-    url: "https://github.com/kevin-10x/swahili-translator",
-  },
-  {
-    repo: "kevin-10x/portfolio_react",
-    title: "portfolio_react",
-    visibility: "Public",
-    language: "CSS",
-    stars: 0,
-    forks: 0,
-    issues: 0,
-    watchers: 0,
-    updated: "Updated yesterday",
-    text: "A React portfolio project for presenting skills, projects, and personal brand work.",
-    url: "https://github.com/kevin-10x/portfolio_react",
-  },
-  {
-    repo: "kevin-10x/Loan_approval_project",
-    title: "Loan_approval_project",
-    visibility: "Public",
-    language: "Python",
-    stars: 0,
-    forks: 0,
-    issues: 0,
-    watchers: 0,
-    updated: "Updated yesterday",
-    text: "A loan approval system exploring decision support and financial workflows.",
-    url: "https://github.com/kevin-10x/Loan_approval_project",
-  },
-  {
-    repo: "kevin-10x/DIGITAL-GOVERNANCE-STACK",
-    title: "DIGITAL-GOVERNANCE-STACK",
-    visibility: "Public",
-    language: "Concept",
-    stars: 0,
-    forks: 0,
-    issues: 0,
-    watchers: 0,
-    updated: "Updated on May 24",
-    text: "A complete digital governance stack from transparency to participation to full national operating systems.",
-    url: "https://github.com/kevin-10x/DIGITAL-GOVERNANCE-STACK",
-  },
-  {
-    repo: "kevin-10x/AI-SMART-TRANSPORT-SYSTEM",
-    title: "AI-SMART-TRANSPORT-SYSTEM",
-    visibility: "Public",
-    language: "Concept",
-    stars: 0,
-    forks: 0,
-    issues: 0,
-    watchers: 0,
-    updated: "Updated on May 23",
-    text: "AI-powered infrastructure for city movement, goods delivery, and real-time route planning.",
-    url: "https://github.com/kevin-10x/AI-SMART-TRANSPORT-SYSTEM",
-  },
-  {
-    repo: "kevin-10x/BUSSINESS-STOCK-CONTROL",
-    title: "BUSSINESS-STOCK-CONTROL",
-    visibility: "Public",
-    language: "Business systems",
-    stars: 0,
-    forks: 0,
-    issues: 0,
-    watchers: 0,
-    updated: "Updated on May 12",
-    text: "A stock management project for business inventory and operational control.",
-    url: "https://github.com/kevin-10x/BUSSINESS-STOCK-CONTROL",
-  },
-  {
-    repo: "kevin-10x/STOCK-CONTROL",
-    title: "STOCK-CONTROL",
-    visibility: "Public",
-    language: "Business systems",
-    stars: 0,
-    forks: 0,
-    issues: 0,
-    watchers: 0,
-    updated: "Updated on May 12",
-    text: "An inventory control project for tracking stock, movement, and business records.",
-    url: "https://github.com/kevin-10x/STOCK-CONTROL",
-  },
-  {
-    repo: "kevin-10x/SHULE-MANAGEMENT-SYSTEM",
-    title: "SHULE-MANAGEMENT-SYSTEM",
-    visibility: "Public",
-    language: "Education systems",
-    stars: 0,
-    forks: 0,
-    issues: 0,
-    watchers: 0,
-    updated: "Updated on May 11",
-    text: "A school management system for organizing core institution workflows.",
-    url: "https://github.com/kevin-10x/SHULE-MANAGEMENT-SYSTEM",
-  },
-  {
-    repo: "kevin-10x/SHULETEC",
-    title: "SHULETEC",
-    visibility: "Public",
-    language: "Education systems",
-    stars: 0,
-    forks: 0,
-    issues: 0,
-    watchers: 0,
-    updated: "Updated on May 11",
-    text: "An education technology project connected to digital school operations.",
-    url: "https://github.com/kevin-10x/SHULETEC",
-  },
-  {
-    repo: "kevin-10x/HAUZRAL-TECHNOLOGIES",
-    title: "HAUZRAL-TECHNOLOGIES",
-    visibility: "Public",
-    language: "Company site",
-    stars: 0,
-    forks: 0,
-    issues: 0,
-    watchers: 0,
-    updated: "Updated on May 9",
-    text: "A Hauzral brand project for presenting technology services and digital products.",
-    url: "https://github.com/kevin-10x/HAUZRAL-TECHNOLOGIES",
-  },
-  {
-    repo: "kevin-10x/advertalgory",
-    title: "advertalgory",
-    visibility: "Public",
-    language: "Advertising tech",
-    stars: 0,
-    forks: 0,
-    issues: 0,
-    watchers: 0,
-    updated: "Updated on Apr 22",
-    text: "An advertising technology concept for campaign systems and market visibility.",
-    url: "https://github.com/kevin-10x/advertalgory",
-  },
-  {
-    repo: "kevin-10x/advert-algory",
-    title: "advert-algory",
-    visibility: "Public",
-    language: "Advertising tech",
-    stars: 0,
-    forks: 0,
-    issues: 0,
-    watchers: 0,
-    updated: "Updated on Apr 22",
-    text: "A companion advertising technology repository exploring a related product direction.",
-    url: "https://github.com/kevin-10x/advert-algory",
-  },
-  {
-    repo: "kevin-10x/kenyacoin",
-    title: "kenyacoin",
-    visibility: "Public",
-    language: "FinTech",
-    stars: 0,
-    forks: 0,
-    issues: 0,
-    watchers: 0,
-    updated: "Updated on Apr 22",
-    text: "A digital currency and finance concept built around Kenyan market ideas.",
-    url: "https://github.com/kevin-10x/kenyacoin",
-  },
-  {
-    repo: "kevin-10x/sokosmartlinkke",
-    title: "sokosmartlinkke",
-    visibility: "Public",
-    language: "Commerce",
-    stars: 0,
-    forks: 0,
-    issues: 0,
-    watchers: 0,
-    updated: "Updated on Apr 22",
-    text: "A marketplace and commerce project for connecting local sellers and buyers.",
-    url: "https://github.com/kevin-10x/sokosmartlinkke",
-  },
-  {
-    repo: "kevin-10x/soko-mtaani",
-    title: "soko-mtaani",
-    visibility: "Public",
-    language: "Commerce",
-    stars: 0,
-    forks: 0,
-    issues: 0,
-    watchers: 0,
-    updated: "Updated on Apr 15",
-    text: "A local commerce project focused on neighborhood-level trade and access.",
-    url: "https://github.com/kevin-10x/soko-mtaani",
+    title: "Flux Commerce",
+    text: "Scaled paid acquisition with a conversion-focused storefront and lifecycle messaging.",
   },
 ];
-
-const featuredProjects = projects.slice(0, 6);
-const projectLanguages = ["All", ...new Set(projects.map((project) => project.language))];
 
 function Header() {
   const [isOpen, setIsOpen] = useState(false);
@@ -318,13 +54,16 @@ function Header() {
       </button>
       <div className={`nav-area${isOpen ? " open" : ""}`}>
         <nav className="nav-links" aria-label="Primary navigation">
-          {["Services", "About", "Work", "Profile", "Contact"].map((item) => (
+          {["Services", "About", "Work", "Contact"].map((item) => (
             <a key={item} href={`#${item.toLowerCase()}`} onClick={closeMenu}>
               {item}
             </a>
           ))}
         </nav>
         <div className="auth-actions">
+          <a className="btn btn-secondary btn-small" href="/api/auth/signup" onClick={closeMenu}>
+            Sign up
+          </a>
           <a className="btn btn-secondary btn-small" href="#signin" onClick={closeMenu}>
             Sign in
           </a>
@@ -341,25 +80,21 @@ function Hero() {
   return (
     <section className="hero">
       <div className="hero-copy">
-        <p className="eyebrow">Kevin Kipkoech | Hauzral Technologies</p>
-        <h1>Building practical technology for business, schools, finance, and public systems.</h1>
+        <p className="eyebrow">Strategy | Design | Growth</p>
+        <h1>We build brands that move markets.</h1>
         <p className="hero-text">
-          Hauzral Technologies is a product-minded studio showcasing Kevin's portfolio of
-          web apps, education platforms, FinTech ideas, commerce tools, and AI infrastructure
-          concepts.
+          Hauzral Technologies helps ambitious companies turn bold ideas into exceptional
+          digital experiences that win attention and accelerate growth.
         </p>
         <div className="hero-actions">
-          <a className="btn btn-primary" href="#get-started">
-            Get started
+          <a className="btn btn-primary" href="#contact">
+            Book a strategy call
           </a>
-          <a className="btn btn-secondary" href="/kipkoechkevin.pdf" target="_blank" rel="noreferrer">
-            View CV
-          </a>
-          <a className="btn btn-google" href="/api/auth/google">
+          <a className="btn btn-google" href="/api/auth/signup">
             <span className="google-mark" aria-hidden="true">
               G
             </span>
-            Sign in with Google
+            Sign up with Google
           </a>
           <a className="btn btn-secondary" href="#work">
             See our work
@@ -367,16 +102,16 @@ function Hero() {
         </div>
         <ul className="hero-stats">
           <li>
-            <strong>20+</strong>
-            <span>public projects</span>
+            <strong>120+</strong>
+            <span>launches</span>
           </li>
           <li>
-            <strong>7</strong>
-            <span>product domains</span>
+            <strong>98%</strong>
+            <span>client retention</span>
           </li>
           <li>
-            <strong>Full-stack</strong>
-            <span>builder profile</span>
+            <strong>4.9/5</strong>
+            <span>average rating</span>
           </li>
         </ul>
       </div>
@@ -384,8 +119,8 @@ function Hero() {
       <div className="hero-visual" aria-hidden="true">
         <div className="panel-card main-panel">
           <div className="panel-dot" />
-          <h3>Portfolio Operating Map</h3>
-          <p>Education, FinTech, logistics, agriculture, commerce, language, and governance systems.</p>
+          <h3>Digital Momentum Studio</h3>
+          <p>Research-led design and growth systems for modern brands.</p>
           <div className="mini-bars">
             <span />
             <span />
@@ -393,197 +128,524 @@ function Hero() {
           </div>
         </div>
         <div className="panel-card floating-card">
-          <p>Public repositories</p>
-          <strong>kevin-10x</strong>
+          <p>ROI-focused campaigns</p>
+          <strong>+320% uplift</strong>
         </div>
       </div>
     </section>
   );
 }
 
-function AuthSection() {
+function ClientPortalSection() {
+  const [signupForm, setSignupForm] = useState({
+    name: "",
+    email: "",
+    company: "",
+    phone: "",
+    projectType: "Custom web app",
+  });
+  const [client, setClient] = useState(null);
+  const [signupMessage, setSignupMessage] = useState("");
+  const [projectForm, setProjectForm] = useState({
+    title: "",
+    summary: "",
+    budget: "",
+    timeline: "",
+    requirements: "",
+  });
+  const [projectMessage, setProjectMessage] = useState("");
+  const [projects, setProjects] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  async function loadProjects(email) {
+    try {
+      const response = await fetch(`/api/clients/${encodeURIComponent(email)}/projects`);
+      const data = await response.json();
+      if (response.ok) {
+        setProjects(data.projects || []);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  useEffect(() => {
+    if (!client?.email) {
+      return undefined;
+    }
+
+    loadProjects(client.email);
+    const timer = window.setInterval(() => {
+      loadProjects(client.email);
+    }, 8000);
+
+    return () => window.clearInterval(timer);
+  }, [client?.email]);
+
+  async function handleSignup(event) {
+    event.preventDefault();
+    setIsSubmitting(true);
+    setSignupMessage("");
+
+    try {
+      const response = await fetch("/api/clients/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(signupForm),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Unable to create client account");
+      }
+
+      setClient(data.client);
+      setSignupMessage(`Welcome ${data.client.name}! Your client portal is ready.`);
+      window.dispatchEvent(new Event("project-updated"));
+      await loadProjects(data.client.email);
+    } catch (error) {
+      setSignupMessage(error instanceof Error ? error.message : "Unable to create account");
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  async function handleProjectSubmit(event) {
+    event.preventDefault();
+    if (!client?.email) {
+      setProjectMessage("Create your client account first to submit a project request.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setProjectMessage("");
+
+    try {
+      const response = await fetch("/api/projects", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          clientEmail: client.email,
+          ...projectForm,
+        }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Unable to submit project request");
+      }
+
+      setProjectMessage("Your project request has been submitted successfully.");
+      window.dispatchEvent(new Event("project-updated"));
+      setProjectForm({
+        title: "",
+        summary: "",
+        budget: "",
+        timeline: "",
+        requirements: "",
+      });
+      await loadProjects(client.email);
+    } catch (error) {
+      setProjectMessage(error instanceof Error ? error.message : "Unable to submit project request");
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  const activeProject = projects[0] || null;
+
   return (
-    <section id="get-started" className="section auth-section">
+    <section id="get-started" className="section portal-section">
       <div className="section-heading">
-        <p className="eyebrow">Start here</p>
-        <h2>Get started with Hauzral in minutes.</h2>
+        <p className="eyebrow">Client portal</p>
+        <h2>Your project signup and delivery workspace.</h2>
         <p>
-          Create an account to save your project brief, review proposals, and track launch
-          milestones from one workspace.
+          Create your client account, share your project brief, and follow every stage of your
+          software delivery journey from one place.
         </p>
       </div>
 
-      <div className="auth-grid">
-        <article className="auth-card">
-          <h3>New to Hauzral?</h3>
-          <p>Start a workspace for your brand and tell us what you want to build.</p>
-          <a className="btn btn-primary" href="#contact">
-            Get started
-          </a>
-        </article>
-
-        <article id="signin" className="auth-card">
-          <h3>Already have an account?</h3>
-          <p>Sign in to continue your strategy brief or review your project dashboard.</p>
-          <div className="stacked-actions">
-            <a className="btn btn-google" href="/api/auth/google">
-              <span className="google-mark" aria-hidden="true">
-                G
-              </span>
-              Continue with Google
-            </a>
-            <a className="btn btn-secondary" href="/api/auth/signin">
-              Sign in
-            </a>
+      <div className="portal-grid">
+        <form className="portal-card" onSubmit={handleSignup}>
+          <h3>Sign up as a client</h3>
+          <p>Tell us who you are and what kind of product you want to build.</p>
+          <div className="form-grid">
+            <label>
+              Full name
+              <input
+                type="text"
+                value={signupForm.name}
+                onChange={(event) =>
+                  setSignupForm((current) => ({ ...current, name: event.target.value }))
+                }
+                required
+              />
+            </label>
+            <label>
+              Email address
+              <input
+                type="email"
+                value={signupForm.email}
+                onChange={(event) =>
+                  setSignupForm((current) => ({ ...current, email: event.target.value }))
+                }
+                required
+              />
+            </label>
+            <label>
+              Company
+              <input
+                type="text"
+                value={signupForm.company}
+                onChange={(event) =>
+                  setSignupForm((current) => ({ ...current, company: event.target.value }))
+                }
+              />
+            </label>
+            <label>
+              Phone
+              <input
+                type="tel"
+                value={signupForm.phone}
+                onChange={(event) =>
+                  setSignupForm((current) => ({ ...current, phone: event.target.value }))
+                }
+              />
+            </label>
+            <label className="full-width">
+              Project focus
+              <select
+                value={signupForm.projectType}
+                onChange={(event) =>
+                  setSignupForm((current) => ({ ...current, projectType: event.target.value }))
+                }
+              >
+                <option>Custom web app</option>
+                <option>Mobile product</option>
+                <option>Marketing website</option>
+                <option>Internal dashboard</option>
+              </select>
+            </label>
           </div>
-        </article>
+          <button className="btn btn-primary" type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Creating account..." : "Create client account"}
+          </button>
+          {signupMessage ? <p className="form-message">{signupMessage}</p> : null}
+        </form>
+
+        <div className="portal-card portal-dashboard">
+          <h3>Client dashboard</h3>
+          <p>
+            Once your account is created, you can submit a project request and follow the delivery
+            flow.
+          </p>
+          {client ? (
+            <div className="dashboard-summary">
+              <div>
+                <strong>{client.name}</strong>
+                <p>{client.email}</p>
+              </div>
+              <div>
+                <strong>{projects.length}</strong>
+                <p>active request(s)</p>
+              </div>
+            </div>
+          ) : (
+            <div className="dashboard-summary muted-card">
+              <p>No account created yet. Sign up to unlock the project tracker.</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {client ? (
+        <div className="portal-grid portal-grid-bottom">
+          <form className="portal-card" onSubmit={handleProjectSubmit}>
+            <h3>Submit a project request</h3>
+            <p>Share your goals so we can kick off the delivery plan.</p>
+            <div className="form-grid">
+              <label className="full-width">
+                Project title
+                <input
+                  type="text"
+                  value={projectForm.title}
+                  onChange={(event) =>
+                    setProjectForm((current) => ({ ...current, title: event.target.value }))
+                  }
+                  required
+                />
+              </label>
+              <label className="full-width">
+                Project brief
+                <textarea
+                  rows="4"
+                  value={projectForm.summary}
+                  onChange={(event) =>
+                    setProjectForm((current) => ({ ...current, summary: event.target.value }))
+                  }
+                  required
+                />
+              </label>
+              <label>
+                Budget range
+                <input
+                  type="text"
+                  value={projectForm.budget}
+                  onChange={(event) =>
+                    setProjectForm((current) => ({ ...current, budget: event.target.value }))
+                  }
+                />
+              </label>
+              <label>
+                Timeline
+                <input
+                  type="text"
+                  value={projectForm.timeline}
+                  onChange={(event) =>
+                    setProjectForm((current) => ({ ...current, timeline: event.target.value }))
+                  }
+                />
+              </label>
+              <label className="full-width">
+                Requirements
+                <textarea
+                  rows="4"
+                  value={projectForm.requirements}
+                  onChange={(event) =>
+                    setProjectForm((current) => ({ ...current, requirements: event.target.value }))
+                  }
+                />
+              </label>
+            </div>
+            <button className="btn btn-primary" type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Submitting..." : "Submit project request"}
+            </button>
+            {projectMessage ? <p className="form-message">{projectMessage}</p> : null}
+          </form>
+
+          <div className="portal-card">
+            <h3>Project development tracker</h3>
+            <p>Every request moves through discovery, planning, design, development, testing, and deployment.</p>
+            {activeProject ? (
+              <>
+                <div className="project-overview">
+                  <h4>{activeProject.title}</h4>
+                  <p>{activeProject.summary}</p>
+                  <div className="metadata-row">
+                    <span>Budget: {activeProject.budget || "Custom"}</span>
+                    <span>Timeline: {activeProject.timeline || "To be confirmed"}</span>
+                  </div>
+                </div>
+                <div className="stage-stack">
+                  {(activeProject.stages || []).map((stage) => (
+                    <div key={stage.name} className="stage-card">
+                      <div className="stage-topline">
+                        <strong>{stage.name}</strong>
+                        <span className={`stage-pill ${stage.status.toLowerCase().replace(/\s+/g, "-")}`}>
+                          {stage.status}
+                        </span>
+                      </div>
+                      <p>{stage.description}</p>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <p className="muted-card">Your submitted project requests will appear here with the full delivery tracker.</p>
+            )}
+          </div>
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
+function AdminDashboard() {
+  const [projects, setProjects] = useState([]);
+  const [selectedProjectId, setSelectedProjectId] = useState("");
+  const [selectedStage, setSelectedStage] = useState("Discovery");
+  const [selectedStatus, setSelectedStatus] = useState("In progress");
+  const [adminMessage, setAdminMessage] = useState("");
+  const [adminNote, setAdminNote] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+
+  async function loadProjects() {
+    try {
+      const response = await fetch("/api/admin/projects");
+      const data = await response.json();
+      if (response.ok) {
+        setProjects(data.projects || []);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  useEffect(() => {
+    loadProjects();
+    const onRefresh = () => loadProjects();
+    window.addEventListener("project-updated", onRefresh);
+    return () => window.removeEventListener("project-updated", onRefresh);
+  }, []);
+
+  useEffect(() => {
+    if (!selectedProjectId && projects.length) {
+      setSelectedProjectId(projects[0].id);
+    }
+  }, [projects, selectedProjectId]);
+
+  async function handleAdminUpdate(event) {
+    event.preventDefault();
+    if (!selectedProjectId) {
+      return;
+    }
+
+    setIsSaving(true);
+    setAdminMessage("");
+
+    try {
+      const response = await fetch(`/api/admin/projects/${selectedProjectId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          stageName: selectedStage,
+          status: selectedStatus,
+          note: adminNote,
+        }),
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Unable to update project progress");
+      }
+
+      setAdminMessage(`Updated ${data.project.title} to ${selectedStage} (${selectedStatus}).`);
+      setAdminNote("");
+      window.dispatchEvent(new Event("project-updated"));
+      await loadProjects();
+    } catch (error) {
+      setAdminMessage(error instanceof Error ? error.message : "Unable to update project progress");
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
+  return (
+    <section className="section admin-section">
+      <div className="section-heading">
+        <p className="eyebrow">Admin dashboard</p>
+        <h2>Review client projects and update delivery progress.</h2>
+        <p>
+          Every project request from the client side appears here so you can guide delivery and
+          keep the client tracker current.
+        </p>
+      </div>
+
+      <div className="portal-grid">
+        <form className="portal-card" onSubmit={handleAdminUpdate}>
+          <h3>Update project progress</h3>
+          <p>Choose the stage that the client should now see and mark the delivery status.</p>
+          <div className="form-grid">
+            <label className="full-width">
+              Project
+              <select
+                value={selectedProjectId}
+                onChange={(event) => setSelectedProjectId(event.target.value)}
+              >
+                {projects.map((project) => (
+                  <option key={project.id} value={project.id}>
+                    {project.title} — {project.client_name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              Delivery stage
+              <select value={selectedStage} onChange={(event) => setSelectedStage(event.target.value)}>
+                <option>Discovery</option>
+                <option>Planning</option>
+                <option>Design</option>
+                <option>Development</option>
+                <option>Testing</option>
+                <option>Deployment</option>
+              </select>
+            </label>
+            <label>
+              Status
+              <select value={selectedStatus} onChange={(event) => setSelectedStatus(event.target.value)}>
+                <option>Queued</option>
+                <option>In progress</option>
+                <option>Completed</option>
+              </select>
+            </label>
+            <label className="full-width">
+              Update note
+              <textarea
+                rows="3"
+                value={adminNote}
+                onChange={(event) => setAdminNote(event.target.value)}
+              />
+            </label>
+          </div>
+          <button className="btn btn-primary" type="submit" disabled={isSaving}>
+            {isSaving ? "Updating..." : "Send update to client"}
+          </button>
+          {adminMessage ? <p className="form-message">{adminMessage}</p> : null}
+        </form>
+
+        <div className="portal-card">
+          <h3>Incoming client requests</h3>
+          <p>Projects appear here the moment a client submits a request from the portal.</p>
+          <div className="stage-stack">
+            {projects.length ? (
+              projects.map((project) => (
+                <div key={project.id} className="stage-card">
+                  <div className="stage-topline">
+                    <strong>{project.title}</strong>
+                    <span className="stage-pill in-progress">{project.stage_status}</span>
+                  </div>
+                  <p>{project.summary}</p>
+                  <div className="metadata-row">
+                    <span>{project.client_name}</span>
+                    <span>{project.client_email}</span>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="muted-card">No client requests yet.</p>
+            )}
+          </div>
+        </div>
       </div>
     </section>
   );
 }
 
-function ProjectExplorer() {
-  const [query, setQuery] = useState("");
-  const [language, setLanguage] = useState("All");
-
-  const filteredProjects = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
-
-    return projects.filter((project) => {
-      const matchesLanguage = language === "All" || project.language === language;
-      const searchable = `${project.title} ${project.repo} ${project.text} ${project.language}`.toLowerCase();
-      const matchesQuery = !normalizedQuery || searchable.includes(normalizedQuery);
-
-      return matchesLanguage && matchesQuery;
-    });
-  }, [language, query]);
+function SocialLinks() {
+  const links = [
+    { name: "YouTube", url: "https://www.youtube.com/@HAUZRALTECHNOLOGIES", icon: "▶" },
+    { name: "TikTok", url: "https://www.tiktok.com/@codingwithzral", icon: "♪" },
+    { name: "X", url: "https://x.com/hauzraltech", icon: "✕" },
+    { name: "Instagram", url: "https://www.instagram.com/hauzraladamae/", icon: "◎" },
+    { name: "Facebook", url: "https://www.facebook.com/profile.php?id=61589578675674", icon: "f" },
+  ];
 
   return (
-    <section className="section project-catalog">
+    <section className="section social-section" aria-label="Social media links">
       <div className="section-heading">
-        <p className="eyebrow">Repository Catalog</p>
-        <h2>A broader product set across software, civic tech, commerce, and AI systems.</h2>
+        <p className="eyebrow">Follow us</p>
+        <h2>Connect with Hauzral on social media.</h2>
       </div>
-
-      <div className="project-tools" aria-label="Project filters">
-        <label className="search-field">
-          <span>Search projects</span>
-          <input
-            type="search"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search by repo, product, or domain"
-          />
-        </label>
-
-        <div className="filter-group" aria-label="Filter by language or category">
-          {projectLanguages.map((item) => (
-            <button
-              className={item === language ? "filter-chip active" : "filter-chip"}
-              type="button"
-              key={item}
-              onClick={() => setLanguage(item)}
-            >
-              {item}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <p className="result-count">
-        Showing {filteredProjects.length} of {projects.length} projects
-      </p>
-
-      <div className="catalog-grid">
-        {filteredProjects.map((project) => (
-          <a className="catalog-item" href={project.url} target="_blank" rel="noreferrer" key={project.title}>
-            <span>
-              {project.visibility} | {project.language}
+      <div className="social-links">
+        {links.map((link) => (
+          <a key={link.name} className="social-link" href={link.url} target="_blank" rel="noreferrer">
+            <span className="social-icon" aria-hidden="true">
+              {link.icon}
             </span>
-            <strong>{project.title}</strong>
-            <small>{project.updated}</small>
+            <span>{link.name}</span>
           </a>
         ))}
       </div>
-    </section>
-  );
-}
-
-function ContactForm() {
-  const [form, setForm] = useState({ name: "", email: "", message: "" });
-  const [status, setStatus] = useState("idle");
-  const [notice, setNotice] = useState("");
-
-  const updateField = (event) => {
-    const { name, value } = event.target;
-    setForm((current) => ({ ...current, [name]: value }));
-  };
-
-  const submitForm = async (event) => {
-    event.preventDefault();
-    setStatus("submitting");
-    setNotice("");
-
-    try {
-      const response = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || "Could not send the message.");
-      }
-
-      setStatus("success");
-      setNotice(result.message || "Message sent. Kevin will follow up.");
-      setForm({ name: "", email: "", message: "" });
-    } catch (error) {
-      setStatus("error");
-      setNotice(error instanceof Error ? error.message : "Could not send the message.");
-    }
-  };
-
-  return (
-    <section id="contact" className="section contact-section">
-      <div className="section-heading">
-        <p className="eyebrow">Contact</p>
-        <h2>Start a conversation about a project, role, or collaboration.</h2>
-        <p>
-          Send a short brief and the backend will receive it through the existing Express API.
-        </p>
-      </div>
-
-      <form className="contact-form" onSubmit={submitForm}>
-        <label>
-          <span>Name</span>
-          <input name="name" value={form.name} onChange={updateField} required />
-        </label>
-        <label>
-          <span>Email</span>
-          <input name="email" type="email" value={form.email} onChange={updateField} required />
-        </label>
-        <label className="full-field">
-          <span>Message</span>
-          <textarea
-            name="message"
-            rows="5"
-            value={form.message}
-            onChange={updateField}
-            required
-          />
-        </label>
-        <div className="form-actions">
-          <button className="btn btn-primary" type="submit" disabled={status === "submitting"}>
-            {status === "submitting" ? "Sending..." : "Send message"}
-          </button>
-          <a className="btn btn-secondary" href="mailto:hello@hauzraltech.com">
-            Email directly
-          </a>
-        </div>
-        {notice ? <p className={`form-notice ${status}`}>{notice}</p> : null}
-      </form>
     </section>
   );
 }
@@ -598,8 +660,8 @@ function App() {
 
         <section className="trusted-bar">
           <p>
-            A portfolio built around real-world Kenyan and African technology needs: schools,
-            markets, finance, logistics, governance, and language.
+            Trusted by founders, startups, and established teams across SaaS, fintech, and
+            retail.
           </p>
         </section>
 
@@ -640,66 +702,16 @@ function App() {
         <section id="work" className="section">
           <div className="section-heading">
             <p className="eyebrow">Selected Work</p>
-            <h2>Projects from the Kevin Kipkoech public portfolio.</h2>
+            <h2>Recent launches shaping the next wave of digital growth.</h2>
           </div>
           <div className="card-grid work-grid">
-            {featuredProjects.map((project) => (
+            {projects.map((project) => (
               <article className="project-card" key={project.title}>
-                <span className="project-stack">
-                  {project.visibility} | {project.language}
-                </span>
                 <h3>{project.title}</h3>
-                <p className="repo-name">{project.repo}</p>
                 <p>{project.text}</p>
-                <ul className="project-meta">
-                  <li>{project.stars} stars</li>
-                  <li>{project.forks} forks</li>
-                  <li>{project.issues} issues</li>
-                  <li>{project.watchers} watchers</li>
-                </ul>
-                <p className="project-updated">{project.updated}</p>
-                <a href={project.url} target="_blank" rel="noreferrer">
-                  View repository
-                </a>
               </article>
             ))}
           </div>
-        </section>
-
-        <ProjectExplorer />
-
-        <section id="profile" className="section split-section profile-section">
-          <div>
-            <p className="eyebrow">Profile</p>
-            <h2>Kevin Kipkoech: founder-builder behind Hauzral's project portfolio.</h2>
-            <p>
-              The portfolio shows a strong bias toward systems that solve practical problems:
-              school management, stock control, local commerce, FinTech tools, transport
-              intelligence, translation, and governance infrastructure.
-            </p>
-          </div>
-          <div className="highlight-box">
-            <h3>CV and links</h3>
-            <p>
-              The uploaded PDF has been added as a downloadable CV asset for visitors and
-              collaborators.
-            </p>
-            <div className="stacked-actions">
-              <a className="btn btn-primary" href="/kipkoechkevin.pdf" target="_blank" rel="noreferrer">
-                View Kevin's CV
-              </a>
-              <a className="btn btn-secondary" href="https://github.com/kevin-10x" target="_blank" rel="noreferrer">
-                GitHub profile
-              </a>
-            </div>
-          </div>
-          <figure className="founder-card">
-            <img src="/founder-kevin.png" alt="Kevin Kipkoech, founder of Hauzral Technologies" />
-            <figcaption>
-              <strong>Kevin Kipkoech</strong>
-              <span>Founder, Hauzral Technologies</span>
-            </figcaption>
-          </figure>
         </section>
 
         <section className="section testimonial-section">
@@ -710,16 +722,16 @@ function App() {
           <blockquote>
             "Hauzral brought our vision to life in a way that felt premium, strategic, and
             instantly effective."
-            <footer>- Maya Chen, Founder at Northstar AI</footer>
+            <footer>- kevin kipkoech, Founder at hauzral technologies</footer>
           </blockquote>
         </section>
 
-        <AuthSection />
-
-        <ContactForm />
+        <ClientPortalSection />
+        <AdminDashboard />
+        <SocialLinks />
       </main>
 
-      <footer className="footer">
+      <footer id="contact" className="footer">
         <div>
           <p className="eyebrow">Ready to grow?</p>
           <h2>Let's build something remarkable together.</h2>
