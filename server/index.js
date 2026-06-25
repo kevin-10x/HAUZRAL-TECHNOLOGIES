@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express from "express";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -13,10 +14,17 @@ const app = express();
 const port = process.env.PORT || 3000;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const distPath = path.resolve(__dirname, "../dist");
-const appUrl = (process.env.APP_URL || `http://localhost:${port}`).replace(/\/$/, "");
 const googleClientId = process.env.GOOGLE_CLIENT_ID;
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
 const adminApiKey = process.env.ADMIN_API_KEY;
+
+function getAppUrl(req) {
+  const forwardedProto = req.get("x-forwarded-proto") || "http";
+  const forwardedHost = req.get("x-forwarded-host");
+  const host = forwardedHost || req.get("host") || `localhost:${port}`;
+
+  return `${forwardedProto}://${host}`;
+}
 
 app.disable("x-powered-by");
 app.set("trust proxy", 1);
@@ -112,11 +120,11 @@ app.get("/api/contact", requireAdmin, async (_req, res) => {
 
 app.get("/api/auth/signin", (_req, res) => {
   res.json({
-    message: "Use /api/auth/google to sign in with Google.",
+    message: "Use /api/auth/google to sign in with Google or /api/auth/signup to create an account.",
   });
 });
 
-app.get("/api/auth/google", (_req, res) => {
+function redirectToGoogleAuth(req, res, mode = "signin") {
   if (!googleClientId) {
     return res.status(501).json({
       error: "Google sign-in is not configured.",
@@ -125,17 +133,23 @@ app.get("/api/auth/google", (_req, res) => {
   }
 
   const authUrl = new URL("https://accounts.google.com/o/oauth2/v2/auth");
+  const appUrl = getAppUrl(req);
   authUrl.searchParams.set("client_id", googleClientId);
   authUrl.searchParams.set("redirect_uri", `${appUrl}/api/auth/google/callback`);
   authUrl.searchParams.set("response_type", "code");
   authUrl.searchParams.set("scope", "openid email profile");
   authUrl.searchParams.set("prompt", "select_account");
+  authUrl.searchParams.set("state", mode);
 
   return res.redirect(authUrl.toString());
-});
+}
+
+app.get("/api/auth/signup", (req, res) => redirectToGoogleAuth(req, res, "signup"));
+
+app.get("/api/auth/google", (req, res) => redirectToGoogleAuth(req, res, "signin"));
 
 app.get("/api/auth/google/callback", async (req, res) => {
-  const { code } = req.query;
+  const { code, state } = req.query;
 
   if (!googleClientId || !googleClientSecret) {
     return res.status(501).json({
@@ -149,6 +163,7 @@ app.get("/api/auth/google/callback", async (req, res) => {
   }
 
   try {
+    const appUrl = getAppUrl(req);
     const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
       method: "POST",
       headers: {
@@ -195,7 +210,7 @@ app.get("/api/auth/google/callback", async (req, res) => {
     const user = await upsertGoogleUser(profile);
 
     return res.json({
-      message: "Google sign-in successful.",
+      message: state === "signup" ? "Google sign-up successful." : "Google sign-in successful.",
       user,
     });
   } catch (error) {
@@ -212,15 +227,13 @@ app.get("*", (_req, res) => {
   res.sendFile(path.join(distPath, "index.html"));
 });
 
-const server = await initializeDatabase()
-  .then(() => {
-    return app.listen(port, () => {
-      console.log(`Hauzral app listening on port ${port}`);
-    });
-  })
+const server = app.listen(port, () => {
+  console.log(`Hauzral app listening on port ${port}`);
+});
+
+initializeDatabase()
   .catch((error) => {
-    console.error("Failed to initialize database", error);
-    process.exit(1);
+    console.warn("Database initialization unavailable; continuing without persistence.", error instanceof Error ? error.message : error);
   });
 
 function shutdown() {

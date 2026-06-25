@@ -12,6 +12,7 @@
     "server:dev": "node --watch server/index.js"
   },
   "dependencies": {
+    "dotenv": "^17.4.2",
     "express": "^4.21.2",
     "pg": "^8.13.1"
   },
