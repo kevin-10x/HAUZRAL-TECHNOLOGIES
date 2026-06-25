@@ -1,6 +1,7 @@
 services:
   hauzral-app:
     build: .
+    restart: unless-stopped
     ports:
       - "3000:3000"
     depends_on:

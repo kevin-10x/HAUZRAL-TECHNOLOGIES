@@ -24,6 +24,11 @@ const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
 const adminApiKey = process.env.ADMIN_API_KEY;
 
 function getAppUrl(req) {
+  const configuredAppUrl = process.env.APP_URL?.trim();
+  if (configuredAppUrl) {
+    return configuredAppUrl.replace(/\/$/, "");
+  }
+
   const forwardedProto = req.get("x-forwarded-proto") || "http";
   const forwardedHost = req.get("x-forwarded-host");
   const host = forwardedHost || req.get("host") || `localhost:${port}`;
@@ -189,7 +194,7 @@ app.get("/api/clients/:email/projects", async (req, res) => {
   }
 });
 
-app.get("/api/admin/projects", async (_req, res) => {
+app.get("/api/admin/projects", requireAdmin, async (_req, res) => {
   try {
     const projects = await listAllProjects();
     return res.json({ projects });
@@ -201,7 +206,7 @@ app.get("/api/admin/projects", async (_req, res) => {
   }
 });
 
-app.patch("/api/admin/projects/:projectId", async (req, res) => {
+app.patch("/api/admin/projects/:projectId", requireAdmin, async (req, res) => {
   const projectId = Number(req.params.projectId);
   const { stageName, status, note } = req.body ?? {};
 
