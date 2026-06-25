@@ -3,10 +3,15 @@ import express from "express";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import {
+  createClient,
   createContactSubmission,
+  createProject,
   db,
   initializeDatabase,
+  listAllProjects,
   listContactSubmissions,
+  listProjectsByClient,
+  updateProjectProgress,
   upsertGoogleUser,
 } from "./db.js";
 
@@ -113,6 +118,103 @@ app.get("/api/contact", requireAdmin, async (_req, res) => {
   } catch (error) {
     return res.status(503).json({
       error: "Could not load contact requests",
+      details: error instanceof Error ? error.message : "Unknown database error",
+    });
+  }
+});
+
+app.post("/api/clients/signup", async (req, res) => {
+  const name = String(req.body?.name ?? "").trim();
+  const email = String(req.body?.email ?? "").trim().toLowerCase();
+  const company = String(req.body?.company ?? "").trim();
+  const phone = String(req.body?.phone ?? "").trim();
+  const projectType = String(req.body?.projectType ?? "").trim();
+
+  if (!name || !email) {
+    return res.status(400).json({ error: "name and email are required" });
+  }
+
+  try {
+    const client = await createClient({ name, email, company, phone, projectType });
+    return res.status(201).json({ message: "Client account created", client });
+  } catch (error) {
+    return res.status(503).json({
+      error: "Could not create client account",
+      details: error instanceof Error ? error.message : "Unknown database error",
+    });
+  }
+});
+
+app.post("/api/projects", async (req, res) => {
+  const clientEmail = String(req.body?.clientEmail ?? "").trim().toLowerCase();
+  const title = String(req.body?.title ?? "").trim();
+  const summary = String(req.body?.summary ?? "").trim();
+  const budget = String(req.body?.budget ?? "").trim();
+  const timeline = String(req.body?.timeline ?? "").trim();
+  const requirements = String(req.body?.requirements ?? "").trim();
+
+  if (!clientEmail || !title || !summary) {
+    return res.status(400).json({ error: "client email, title, and summary are required" });
+  }
+
+  try {
+    const project = await createProject({
+      clientEmail,
+      title,
+      summary,
+      budget,
+      timeline,
+      requirements,
+    });
+
+    return res.status(201).json({ message: "Project request submitted", project });
+  } catch (error) {
+    return res.status(503).json({
+      error: "Could not submit project request",
+      details: error instanceof Error ? error.message : "Unknown database error",
+    });
+  }
+});
+
+app.get("/api/clients/:email/projects", async (req, res) => {
+  try {
+    const email = decodeURIComponent(req.params.email).trim().toLowerCase();
+    const projects = await listProjectsByClient(email);
+    return res.json({ projects });
+  } catch (error) {
+    return res.status(503).json({
+      error: "Could not load client projects",
+      details: error instanceof Error ? error.message : "Unknown database error",
+    });
+  }
+});
+
+app.get("/api/admin/projects", async (_req, res) => {
+  try {
+    const projects = await listAllProjects();
+    return res.json({ projects });
+  } catch (error) {
+    return res.status(503).json({
+      error: "Could not load admin projects",
+      details: error instanceof Error ? error.message : "Unknown database error",
+    });
+  }
+});
+
+app.patch("/api/admin/projects/:projectId", async (req, res) => {
+  const projectId = Number(req.params.projectId);
+  const { stageName, status, note } = req.body ?? {};
+
+  if (!projectId || !stageName) {
+    return res.status(400).json({ error: "project id and stage name are required" });
+  }
+
+  try {
+    const project = await updateProjectProgress(projectId, { stageName, status, note });
+    return res.json({ message: "Project progress updated", project });
+  } catch (error) {
+    return res.status(503).json({
+      error: "Could not update project progress",
       details: error instanceof Error ? error.message : "Unknown database error",
     });
   }
