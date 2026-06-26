@@ -481,3 +481,29 @@ export async function updateProjectProgress(projectId, { stageName, status, note
     stages: result.rows[0].stages ?? nextStages,
   };
 }
+
+export async function deleteProject(projectId) {
+  if (!db) {
+    const initialLength = memoryStore.projects.length;
+    memoryStore.projects = memoryStore.projects.filter((item) => item.id !== Number(projectId));
+    if (memoryStore.projects.length === initialLength) {
+      throw new Error("Project not found");
+    }
+    return { success: true };
+  }
+
+  const result = await db.query(
+    `
+      DELETE FROM client_projects
+      WHERE id = $1;
+    `,
+    [projectId],
+  );
+
+  if (!result.rowCount) {
+    throw new Error("Project not found");
+  }
+
+  return { success: true };
+}
+

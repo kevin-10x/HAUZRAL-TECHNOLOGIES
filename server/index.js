@@ -13,6 +13,7 @@ import {
   listProjectsByClient,
   updateProjectProgress,
   upsertGoogleUser,
+  deleteProject,
 } from "./db.js";
 
 const app = express();
@@ -220,6 +221,24 @@ app.patch("/api/admin/projects/:projectId", requireAdmin, async (req, res) => {
   } catch (error) {
     return res.status(503).json({
       error: "Could not update project progress",
+      details: error instanceof Error ? error.message : "Unknown database error",
+    });
+  }
+});
+
+app.delete("/api/admin/projects/:projectId", requireAdmin, async (req, res) => {
+  const projectId = Number(req.params.projectId);
+
+  if (!projectId) {
+    return res.status(400).json({ error: "project id is required" });
+  }
+
+  try {
+    await deleteProject(projectId);
+    return res.json({ message: "Project deleted successfully" });
+  } catch (error) {
+    return res.status(503).json({
+      error: "Could not delete project",
       details: error instanceof Error ? error.message : "Unknown database error",
     });
   }

@@ -65,6 +65,31 @@ function AdminDashboard() {
     }
   }
 
+  async function deleteProject(projectId) {
+    if (!window.confirm("Are you sure you want to delete this project?")) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/admin/projects/${projectId}`, {
+        method: "DELETE",
+        headers: {
+          "x-admin-api-key": adminApiKey,
+        },
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Unable to delete project");
+      }
+
+      setMessage("Project deleted successfully.");
+      await loadProjects();
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Unable to delete project");
+    }
+  }
+
   return (
     <section className="section">
       <h2>Admin dashboard</h2>
@@ -121,6 +146,14 @@ function AdminDashboard() {
                 />
                 <button className="btn btn-secondary" type="button" onClick={() => updateProject(project.id)}>
                   Update stage
+                </button>
+                <button 
+                  className="btn btn-secondary" 
+                  style={{ backgroundColor: "rgba(239, 68, 68, 0.1)", borderColor: "rgba(239, 68, 68, 0.4)", color: "#f87171" }}
+                  type="button" 
+                  onClick={() => deleteProject(project.id)}
+                >
+                  Delete Project
                 </button>
               </div>
             </article>

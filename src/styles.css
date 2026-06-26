@@ -1,5 +1,20 @@
 :root {
-  color-scheme: dark;
+  color-scheme: light;
+  --bg: #f5f7ff;
+  --bg-soft: #e8efff;
+  --surface: rgba(255, 255, 255, 0.9);
+  --surface-strong: rgba(0, 0, 0, 0.2);
+  --text: #1a1a1a;
+  --muted: #555555;
+  --accent: #5b5bff;
+  --accent-2: #0fa9e6;
+  --accent-3: #ff4081;
+  --border: rgba(0, 0, 0, 0.12);
+  --shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+/* Dark theme overrides */
+.dark {
   --bg: #040816;
   --bg-soft: #0c1630;
   --surface: rgba(8, 15, 29, 0.72);
@@ -11,6 +26,10 @@
   --accent-3: #ff5edb;
   --border: rgba(255, 255, 255, 0.12);
   --shadow: 0 24px 70px rgba(2, 8, 23, 0.45);
+}
+
+html, body {
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 * {

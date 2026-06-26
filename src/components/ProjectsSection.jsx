@@ -2,16 +2,16 @@ import React from "react";
 
 const projects = [
   {
-    title: "Northstar AI",
-    text: "Repositioned a B2B platform with a sharper narrative and flagship website.",
+    title: "Full-Stack Web Application Development",
+    text: "Developed responsive and scalable web applications using React.js, Node.js, Express.js, and MySQL databases, working on frontend and backend functionalities including authentication systems, API integration, and database management.",
   },
   {
-    title: "Orchid Capital",
-    text: "Designed a polished investor experience that elevated credibility and trust.",
+    title: "Backend API Development",
+    text: "Designed and implemented backend services and RESTful APIs using Express.js and Node.js. Focused on optimizing database queries, improving performance, and ensuring secure communication between systems.",
   },
   {
-    title: "Flux Commerce",
-    text: "Scaled paid acquisition with a conversion-focused storefront and lifecycle messaging.",
+    title: "AI Data Labeling Project",
+    text: "Participated in AI dataset annotation projects where he categorized, labeled, and validated datasets used for machine learning training, contributing to improving data quality and supporting AI model performance.",
   },
 ];
 
