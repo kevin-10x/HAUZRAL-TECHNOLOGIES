@@ -81,17 +81,29 @@ export default function LoginPage() {
         if (!res.ok) {
           throw new Error("Invalid admin credentials.");
         }
-        login({ email: form.email, role: "admin", name: "Admin" });
+        // Store the API key so AdminDashboard can use it without re-entering
+        login({ email: form.email, role: "admin", name: "Admin", apiKey: form.password });
         navigate(redirectAfterAuth, { replace: true });
         return;
       }
 
-      // --- Client: look up projects by email to verify the account exists ---
-      const res = await fetch(`/api/clients/${encodeURIComponent(form.email)}/projects`);
+      // --- Client: verify the account exists via dedicated endpoint ---
+      const res = await fetch(
+        `/api/clients/${encodeURIComponent(form.email)}/verify`
+      );
       if (!res.ok) {
-        throw new Error("No account found with that email. Create one below.");
+        const data = await res.json().catch(() => ({}));
+        throw new Error(
+          data.error ||
+            "No account found with that email. Sign up first."
+        );
       }
-      login({ email: form.email, role: "client", name: form.email.split("@")[0] });
+      const data = await res.json();
+      login({
+        email: data.email || form.email,
+        role: "client",
+        name: data.name || form.email.split("@")[0],
+      });
       navigate(redirectAfterAuth, { replace: true });
     } catch (err) {
       setError(err.message ?? "Sign-in failed. Please try again.");

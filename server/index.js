@@ -7,6 +7,7 @@ import {
   createContactSubmission,
   createProject,
   db,
+  findClientByEmail,
   initializeDatabase,
   listAllProjects,
   listContactSubmissions,
@@ -190,6 +191,23 @@ app.get("/api/clients/:email/projects", async (req, res) => {
   } catch (error) {
     return res.status(503).json({
       error: "Could not load client projects",
+      details: error instanceof Error ? error.message : "Unknown database error",
+    });
+  }
+});
+
+// Verify a client account exists by email (used by login flow)
+app.get("/api/clients/:email/verify", async (req, res) => {
+  try {
+    const email = decodeURIComponent(req.params.email).trim().toLowerCase();
+    const client = await findClientByEmail(email);
+    if (!client) {
+      return res.status(404).json({ error: "No client account found with that email." });
+    }
+    return res.json({ exists: true, name: client.name, email: client.email });
+  } catch (error) {
+    return res.status(503).json({
+      error: "Could not verify client account",
       details: error instanceof Error ? error.message : "Unknown database error",
     });
   }

@@ -289,7 +289,7 @@ function ProjectRequestForm({ clientEmail, onProjectAdded }) {
 
       setMessage("✅ Project request submitted successfully!");
       setForm({ title: "", summary: "", budget: "", timeline: "", requirements: "" });
-      onProjectAdded();
+      onProjectAdded(false);
     } catch (err) {
       setMessage(`❌ ${err.message}`);
     } finally {
@@ -408,8 +408,9 @@ export default function ClientPortalSection() {
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
 
-  const fetchProjects = useCallback(async () => {
+  const fetchProjects = useCallback(async (isInitial = false) => {
     if (!user?.email) return;
+    if (isInitial) setLoading(true);
     try {
       const res = await fetch(`/api/clients/${encodeURIComponent(user.email)}/projects`);
       const data = await res.json();
@@ -422,15 +423,14 @@ export default function ClientPortalSection() {
     } catch {
       setLoadError("Network error — could not load projects.");
     } finally {
-      setLoading(false);
+      if (isInitial) setLoading(false);
     }
   }, [user?.email]);
 
   /* Initial load + 10s poll for live updates */
   useEffect(() => {
-    setLoading(true);
-    fetchProjects();
-    const timer = setInterval(fetchProjects, 10_000);
+    fetchProjects(true);
+    const timer = setInterval(() => fetchProjects(false), 10_000);
     return () => clearInterval(timer);
   }, [fetchProjects]);
 

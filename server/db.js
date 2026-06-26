@@ -288,6 +288,24 @@ export async function createClient({ name, email, company, phone, projectType, p
   return result.rows[0];
 }
 
+export async function findClientByEmail(email) {
+  const normalizedEmail = String(email || "").trim().toLowerCase();
+  if (!normalizedEmail) return null;
+
+  if (!db) {
+    return memoryStore.clients.find(
+      (client) => client.email === normalizedEmail
+    ) || null;
+  }
+
+  const result = await db.query(
+    `SELECT id, name, email, company, phone, project_type, google_id, created_at
+     FROM clients WHERE LOWER(email) = $1;`,
+    [normalizedEmail]
+  );
+  return result.rows[0] || null;
+}
+
 export async function findClientByEmailOrPhone(identifier) {
   const queryVal = String(identifier || "").trim().toLowerCase();
   if (!queryVal) return null;

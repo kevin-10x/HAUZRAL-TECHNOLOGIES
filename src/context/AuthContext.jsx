@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useState } from "react";
 
 const AuthContext = createContext(null);
 
@@ -24,18 +24,19 @@ export function AuthProvider({ children }) {
     }
   }, [user]);
 
-  function login(userData) {
+  // Stable references — safe to use in useEffect dependency arrays
+  const login = useCallback((userData) => {
     setUser(userData);
-  }
+  }, []);
 
-  function logout() {
+  const logout = useCallback(() => {
     setUser(null);
     localStorage.removeItem("hauzral-user");
     localStorage.removeItem("user-session");
-  }
+  }, []);
 
-  const isAdmin = user?.role === "admin";
-  const isClient = user?.role === "client";
+  const isAdmin   = user?.role === "admin";
+  const isClient  = user?.role === "client";
   const isLoggedIn = Boolean(user);
 
   return (

@@ -21,7 +21,9 @@ function LogoutPage() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [navigate, logout]);
+    // logout is stable (useCallback), navigate is stable — safe to list
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <section className="section" style={{ textAlign: "center", padding: "80px 20px" }}>
