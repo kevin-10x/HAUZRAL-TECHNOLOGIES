@@ -335,10 +335,29 @@ app.get("/api/auth/google/callback", async (req, res) => {
 
     const user = await upsertGoogleUser(profile);
 
-    const frontendUrl = process.env.CLIENT_URL || process.env.APP_URL || "http://localhost:3000";
-    const redirectPath = state === "signup" ? "/client-portal" : "/";
+    // For both signup and signin via Google, ensure a client record exists
+    // so the portal can look up projects by email.
+    try {
+      await createClient({
+        name: profile.name || profile.email,
+        email: profile.email,
+        googleId: String(profile.sub),
+      });
+    } catch (_clientErr) {
+      // Non-fatal: client record may already exist
+    }
 
-    return res.redirect(`${frontendUrl}${redirectPath}`);
+    const frontendUrl = process.env.CLIENT_URL || process.env.APP_URL || "http://localhost:3000";
+
+    // Build the auth-callback URL so the React app can hydrate its session
+    const callbackUrl = new URL(`${frontendUrl}/auth-callback`);
+    callbackUrl.searchParams.set("name",    profile.name    || "");
+    callbackUrl.searchParams.set("email",   profile.email   || "");
+    callbackUrl.searchParams.set("picture", profile.picture || "");
+    callbackUrl.searchParams.set("role",    "client");
+    callbackUrl.searchParams.set("redirect", "/client-portal");
+
+    return res.redirect(callbackUrl.toString());
   } catch (error) {
     return res.status(500).json({
       error: "Google sign-in failed.",

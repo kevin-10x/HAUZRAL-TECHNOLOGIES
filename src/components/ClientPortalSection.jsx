@@ -435,6 +435,7 @@ export default function ClientPortalSection() {
   }, [fetchProjects]);
 
   const displayName = user?.name || user?.email?.split("@")[0] || "Client";
+  const isFirstVisit = !loading && !loadError && projects.length === 0;
 
   return (
     <section className="section">
@@ -451,143 +452,176 @@ export default function ClientPortalSection() {
       >
         <div>
           <p className="eyebrow">Client Portal</p>
-          <h2 style={{ margin: "0 0 6px" }}>Welcome back, {displayName} 👋</h2>
+          <h2 style={{ margin: "0 0 6px" }}>
+            {isFirstVisit ? `Welcome to Hauzral, ${displayName} 🎉` : `Welcome back, ${displayName} 👋`}
+          </h2>
           <p style={{ margin: 0, color: "var(--muted)", fontSize: "0.9rem" }}>
-            Track your project progress and submit new requests.
+            {isFirstVisit
+              ? "Your account is ready. Submit your first project to get started."
+              : "Track your project progress and submit new requests."}
           </p>
         </div>
-        <div
-          style={{
-            padding: "10px 16px",
-            borderRadius: "12px",
-            background: "rgba(45,212,191,0.08)",
-            border: "1px solid rgba(45,212,191,0.22)",
-            fontSize: "0.82rem",
-            color: "var(--accent-2)",
-          }}
-        >
-          🔄 Updates every 10s
-        </div>
-      </div>
-
-      {/* Summary stats */}
-      {projects.length > 0 && (
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
-            gap: "14px",
-            marginBottom: "32px",
-          }}
-        >
-          {[
-            { label: "Total projects", value: projects.length, icon: "📁" },
-            {
-              label: "In progress",
-              value: projects.filter((p) => p.stage_status && p.stage_status !== "Deployment").length,
-              icon: "🔄",
-            },
-            {
-              label: "Completed",
-              value: projects.filter((p) => p.stage_status === "Deployment").length,
-              icon: "✅",
-            },
-          ].map((stat) => (
-            <div
-              key={stat.label}
-              style={{
-                padding: "16px 18px",
-                borderRadius: "14px",
-                background: "rgba(255,255,255,0.04)",
-                border: "1px solid var(--border)",
-                textAlign: "center",
-              }}
-            >
-              <div style={{ fontSize: "1.5rem", marginBottom: "4px" }}>{stat.icon}</div>
-              <div style={{ fontSize: "1.4rem", fontWeight: 700 }}>{stat.value}</div>
-              <div style={{ fontSize: "0.78rem", color: "var(--muted)" }}>{stat.label}</div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Project list */}
-      <div style={{ marginBottom: "36px" }}>
-        <h3 style={{ marginBottom: "16px" }}>
-          Your projects{" "}
-          {!loading && (
-            <span
-              style={{
-                fontSize: "0.8rem",
-                fontWeight: 400,
-                color: "var(--muted)",
-                marginLeft: "6px",
-              }}
-            >
-              ({projects.length})
-            </span>
-          )}
-        </h3>
-
-        {loading ? (
+        {!isFirstVisit && (
           <div
             style={{
-              padding: "40px",
-              textAlign: "center",
-              color: "var(--muted)",
-              border: "1px dashed var(--border)",
-              borderRadius: "16px",
+              padding: "10px 16px",
+              borderRadius: "12px",
+              background: "rgba(45,212,191,0.08)",
+              border: "1px solid rgba(45,212,191,0.22)",
+              fontSize: "0.82rem",
+              color: "var(--accent-2)",
             }}
           >
-            <div style={{ fontSize: "2rem", marginBottom: "8px" }}>⏳</div>
-            Loading your projects…
-          </div>
-        ) : loadError ? (
-          <div
-            style={{
-              padding: "24px",
-              borderRadius: "14px",
-              background: "rgba(255,64,129,0.08)",
-              border: "1px solid rgba(255,64,129,0.25)",
-              color: "var(--accent-3)",
-              fontSize: "0.9rem",
-            }}
-          >
-            {loadError}
-          </div>
-        ) : projects.length === 0 ? (
-          <div
-            style={{
-              padding: "40px",
-              textAlign: "center",
-              color: "var(--muted)",
-              border: "1px dashed var(--border)",
-              borderRadius: "16px",
-            }}
-          >
-            <div style={{ fontSize: "2.5rem", marginBottom: "10px" }}>📭</div>
-            <p style={{ margin: "0 0 6px", fontWeight: 600 }}>No projects yet</p>
-            <p style={{ margin: 0, fontSize: "0.88rem" }}>
-              Submit your first project request below to get started.
-            </p>
-          </div>
-        ) : (
-          <div
-            style={{
-              display: "grid",
-              gap: "20px",
-              gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))",
-            }}
-          >
-            {projects.map((project) => (
-              <ProjectCard key={project.id} project={project} />
-            ))}
+            🔄 Updates every 10s
           </div>
         )}
       </div>
 
-      {/* Submit new project */}
-      <ProjectRequestForm clientEmail={user.email} onProjectAdded={fetchProjects} />
+      {/* First-time onboarding: skip stats + empty list, go straight to the form */}
+      {isFirstVisit ? (
+        <>
+          {/* Onboarding checklist */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+              gap: "12px",
+              marginBottom: "32px",
+            }}
+          >
+            {[
+              { icon: "✅", label: "Account created" },
+              { icon: "📝", label: "Submit your first project", active: true },
+              { icon: "🔄", label: "Track development stages" },
+              { icon: "🚀", label: "Go live" },
+            ].map((step) => (
+              <div
+                key={step.label}
+                style={{
+                  padding: "14px 16px",
+                  borderRadius: "12px",
+                  background: step.active
+                    ? "rgba(45,212,191,0.09)"
+                    : "rgba(255,255,255,0.04)",
+                  border: `1px solid ${step.active ? "rgba(45,212,191,0.3)" : "var(--border)"}`,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                  fontSize: "0.88rem",
+                  color: step.active ? "var(--text)" : "var(--muted)",
+                  fontWeight: step.active ? 600 : 400,
+                }}
+              >
+                <span style={{ fontSize: "1.2rem" }}>{step.icon}</span>
+                {step.label}
+              </div>
+            ))}
+          </div>
+
+          {/* Submission form — primary action on first visit */}
+          <ProjectRequestForm clientEmail={user.email} onProjectAdded={fetchProjects} />
+        </>
+      ) : (
+        <>
+          {/* Summary stats */}
+          {projects.length > 0 && (
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
+                gap: "14px",
+                marginBottom: "32px",
+              }}
+            >
+              {[
+                { label: "Total projects", value: projects.length, icon: "📁" },
+                {
+                  label: "In progress",
+                  value: projects.filter(
+                    (p) => p.stage_status && p.stage_status !== "Deployment"
+                  ).length,
+                  icon: "🔄",
+                },
+                {
+                  label: "Completed",
+                  value: projects.filter((p) => p.stage_status === "Deployment").length,
+                  icon: "✅",
+                },
+              ].map((stat) => (
+                <div
+                  key={stat.label}
+                  style={{
+                    padding: "16px 18px",
+                    borderRadius: "14px",
+                    background: "rgba(255,255,255,0.04)",
+                    border: "1px solid var(--border)",
+                    textAlign: "center",
+                  }}
+                >
+                  <div style={{ fontSize: "1.5rem", marginBottom: "4px" }}>{stat.icon}</div>
+                  <div style={{ fontSize: "1.4rem", fontWeight: 700 }}>{stat.value}</div>
+                  <div style={{ fontSize: "0.78rem", color: "var(--muted)" }}>{stat.label}</div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Project list */}
+          <div style={{ marginBottom: "36px" }}>
+            <h3 style={{ marginBottom: "16px" }}>
+              Your projects{" "}
+              {!loading && (
+                <span style={{ fontSize: "0.8rem", fontWeight: 400, color: "var(--muted)", marginLeft: "6px" }}>
+                  ({projects.length})
+                </span>
+              )}
+            </h3>
+
+            {loading ? (
+              <div
+                style={{
+                  padding: "40px",
+                  textAlign: "center",
+                  color: "var(--muted)",
+                  border: "1px dashed var(--border)",
+                  borderRadius: "16px",
+                }}
+              >
+                <div style={{ fontSize: "2rem", marginBottom: "8px" }}>⏳</div>
+                Loading your projects…
+              </div>
+            ) : loadError ? (
+              <div
+                style={{
+                  padding: "24px",
+                  borderRadius: "14px",
+                  background: "rgba(255,64,129,0.08)",
+                  border: "1px solid rgba(255,64,129,0.25)",
+                  color: "var(--accent-3)",
+                  fontSize: "0.9rem",
+                }}
+              >
+                {loadError}
+              </div>
+            ) : (
+              <div
+                style={{
+                  display: "grid",
+                  gap: "20px",
+                  gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))",
+                }}
+              >
+                {projects.map((project) => (
+                  <ProjectCard key={project.id} project={project} />
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Submit new project */}
+          <ProjectRequestForm clientEmail={user.email} onProjectAdded={fetchProjects} />
+        </>
+      )}
     </section>
   );
 }

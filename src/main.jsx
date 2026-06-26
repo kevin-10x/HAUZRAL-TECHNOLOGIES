@@ -16,6 +16,7 @@ import DocumentPage from "./pages/DocumentPage";
 import LogoutPage from "./pages/LogoutPage";
 import LoginPage from "./pages/LoginPage";
 import SignupPage from "./pages/SignupPage";
+import AuthCallbackPage from "./pages/AuthCallbackPage";
 import { ThemeProvider } from "./components/ThemeProvider";
 import { AuthProvider } from "./context/AuthContext";
 
@@ -39,6 +40,7 @@ function App() {
               <Route path="/logout" element={<LogoutPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupPage />} />
+              <Route path="/auth-callback" element={<AuthCallbackPage />} />
               <Route
                 path="*"
                 element={

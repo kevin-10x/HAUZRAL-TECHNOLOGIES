@@ -8,10 +8,11 @@ export default function ClientPortalPage() {
   const location = useLocation();
 
   if (!isLoggedIn) {
+    // Preserve the destination so the user lands here after signing in
     return (
       <Navigate
         to="/login"
-        state={{ from: "/client-portal", mode: "signin" }}
+        state={{ from: location.pathname, mode: "signin" }}
         replace
       />
     );
