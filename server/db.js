@@ -129,6 +129,18 @@ export async function initializeDatabase() {
     );
   `);
 
+  try {
+    await db.query(`ALTER TABLE clients ADD COLUMN IF NOT EXISTS password TEXT;`);
+  } catch (error) {
+    console.error("Migration error adding password column to clients:", error);
+  }
+
+  try {
+    await db.query(`ALTER TABLE clients ADD COLUMN IF NOT EXISTS google_id TEXT;`);
+  } catch (error) {
+    console.error("Migration error adding google_id column to clients:", error);
+  }
+
   await db.query(`
     CREATE TABLE IF NOT EXISTS client_projects (
       id BIGSERIAL PRIMARY KEY,
@@ -226,7 +238,7 @@ export async function upsertGoogleUser(profile) {
   return result.rows[0];
 }
 
-export async function createClient({ name, email, company, phone, projectType }) {
+export async function createClient({ name, email, company, phone, projectType, password, googleId }) {
   const normalizedEmail = String(email || "").trim().toLowerCase();
   const normalizedName = String(name || "").trim();
 
@@ -243,6 +255,8 @@ export async function createClient({ name, email, company, phone, projectType })
       company,
       phone,
       project_type: projectType,
+      password,
+      google_id: googleId,
       created_at: existingClient ? existingClient.created_at : new Date().toISOString(),
     };
 
@@ -257,19 +271,65 @@ export async function createClient({ name, email, company, phone, projectType })
 
   const result = await db.query(
     `
-      INSERT INTO clients (name, email, company, phone, project_type)
-      VALUES ($1, $2, $3, $4, $5)
+      INSERT INTO clients (name, email, company, phone, project_type, password, google_id)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
       ON CONFLICT (email) DO UPDATE SET
         name = EXCLUDED.name,
         company = EXCLUDED.company,
         phone = EXCLUDED.phone,
-        project_type = EXCLUDED.project_type
+        project_type = EXCLUDED.project_type,
+        password = EXCLUDED.password,
+        google_id = EXCLUDED.google_id
       RETURNING id, name, email, company, phone, project_type, created_at;
     `,
-    [normalizedName, normalizedEmail, company, phone, projectType],
+    [normalizedName, normalizedEmail, company, phone, projectType, password, googleId],
   );
 
   return result.rows[0];
+}
+
+export async function findClientByEmailOrPhone(identifier) {
+  const queryVal = String(identifier || "").trim().toLowerCase();
+  if (!queryVal) return null;
+
+  if (!db) {
+    return memoryStore.clients.find(
+      (client) =>
+        client.email.toLowerCase() === queryVal ||
+        (client.phone && client.phone.trim() === queryVal)
+    ) || null;
+  }
+
+  const result = await db.query(
+    `
+      SELECT id, name, email, company, phone, project_type, password, google_id, created_at
+      FROM clients
+      WHERE LOWER(email) = $1 OR phone = $2;
+    `,
+    [queryVal, queryVal]
+  );
+
+  return result.rows[0] || null;
+}
+
+export async function findGoogleUser(providerId, email) {
+  const normalizedEmail = String(email || "").trim().toLowerCase();
+  if (!db) {
+    return memoryStore.users.find(
+      (u) => u.provider_id === String(providerId) && u.email.toLowerCase() === normalizedEmail
+    ) || null;
+  }
+
+  const result = await db.query(
+    `
+      SELECT id, provider, provider_id, name, email, picture, last_signed_in_at, created_at
+      FROM users
+      WHERE provider_id = $1 AND LOWER(email) = $2;
+    `,
+    [providerId, normalizedEmail]
+  );
+
+  return result.rows[0] || null;
 }
 
 export async function createProject({ clientEmail, title, summary, budget, timeline, requirements }) {

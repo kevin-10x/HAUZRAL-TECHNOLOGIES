@@ -783,3 +783,37 @@ blockquote footer {
 .nav-links a.active {
   color: var(--text);
 }
+
+/* ── Auth header button visibility ───────────────────────── */
+.header-auth-desktop {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.header-auth-mobile {
+  display: none;
+}
+
+@media (max-width: 700px) {
+  .header-auth-desktop {
+    display: none;
+  }
+
+  .header-auth-mobile {
+    display: flex;
+  }
+}
+
+/* ── Auth page card polish ────────────────────────────────── */
+.btn-google {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border);
+  color: var(--text);
+  gap: 10px;
+}
+
+.btn-google:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.22);
+}

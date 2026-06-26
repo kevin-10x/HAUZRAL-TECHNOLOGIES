@@ -1,22 +1,28 @@
 import React, { useState } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useTheme } from "./ThemeProvider";
+import { useAuth } from "../context/AuthContext";
 
-const navItems = [
+const publicNavItems = [
   { to: "/", label: "Home" },
-  { to: "/about", label: "About (Founder)" },
+  { to: "/about", label: "About" },
   { to: "/services", label: "Services" },
   { to: "/work", label: "Work" },
   { to: "/document", label: "CV/Resume" },
-  { to: "/client-portal", label: "Client Portal" },
-  { to: "/admin", label: "Admin" },
-  { to: "/settings", label: "Settings" },
-  { to: "/logout", label: "Logout" },
+  { to: "/contact", label: "Contact" },
 ];
 
 function Header() {
   const { isDark, toggleTheme } = useTheme();
+  const { user, isLoggedIn, isAdmin, logout } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
+
+  function handleLogout() {
+    logout();
+    setMenuOpen(false);
+    navigate("/");
+  }
 
   return (
     <header className="topbar" style={{ display: "flex", flexDirection: "column", alignItems: "stretch" }}>
@@ -25,20 +31,68 @@ function Header() {
           <span className="brand-mark">H</span>
           <span>Hauzral Technologies</span>
         </Link>
-        
-        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          <button 
-            className="btn btn-secondary" 
-            onClick={toggleTheme} 
-            style={{ padding: "8px 16px", fontSize: "0.85rem" }}
+
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <button
+            className="btn btn-secondary"
+            onClick={toggleTheme}
+            style={{ padding: "8px 14px", fontSize: "0.85rem" }}
             title="Toggle light/dark theme"
           >
             {isDark ? "☀️ Light" : "🌙 Dark"}
           </button>
-          
-          <button 
-            className="menu-toggle" 
-            onClick={() => setMenuOpen(!menuOpen)} 
+
+          {/* Auth buttons — hidden on mobile (shown in expanded menu) */}
+          <div className="header-auth-desktop">
+            {isLoggedIn ? (
+              <>
+                <span
+                  style={{
+                    fontSize: "0.82rem",
+                    color: "var(--muted)",
+                    padding: "0 4px",
+                    maxWidth: "130px",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {user.name || user.email}
+                </span>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={handleLogout}
+                  style={{ padding: "8px 16px", fontSize: "0.85rem" }}
+                >
+                  Log out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  className="btn btn-secondary"
+                  onClick={() => setMenuOpen(false)}
+                  style={{ padding: "8px 16px", fontSize: "0.85rem" }}
+                >
+                  Sign in
+                </Link>
+                <Link
+                  to="/signup"
+                  className="btn btn-primary"
+                  onClick={() => setMenuOpen(false)}
+                  style={{ padding: "8px 16px", fontSize: "0.85rem" }}
+                >
+                  Sign up
+                </Link>
+              </>
+            )}
+          </div>
+
+          <button
+            className="menu-toggle"
+            onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Toggle navigation menu"
             style={{ display: "flex", cursor: "pointer" }}
           >
@@ -49,15 +103,12 @@ function Header() {
         </div>
       </div>
 
-      <nav 
-        className={`nav-links ${menuOpen ? "open" : ""}`} 
+      <nav
+        className={`nav-links ${menuOpen ? "open" : ""}`}
         aria-label="Primary navigation"
-        style={{ 
-          marginTop: menuOpen ? "16px" : "0px",
-          transition: "all 0.3s ease" 
-        }}
+        style={{ marginTop: menuOpen ? "16px" : "0px", transition: "all 0.3s ease" }}
       >
-        {navItems.map((item) => (
+        {publicNavItems.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
@@ -68,6 +119,71 @@ function Header() {
             {item.label}
           </NavLink>
         ))}
+
+        {/* Authenticated portal links */}
+        {isLoggedIn && (
+          <NavLink
+            to="/client-portal"
+            className={({ isActive }) => (isActive ? "active" : "")}
+            onClick={() => setMenuOpen(false)}
+            style={{ padding: "8px 0" }}
+          >
+            Client Portal
+          </NavLink>
+        )}
+        {isAdmin && (
+          <NavLink
+            to="/admin"
+            className={({ isActive }) => (isActive ? "active" : "")}
+            onClick={() => setMenuOpen(false)}
+            style={{ padding: "8px 0" }}
+          >
+            Admin
+          </NavLink>
+        )}
+        {isLoggedIn && (
+          <NavLink
+            to="/settings"
+            className={({ isActive }) => (isActive ? "active" : "")}
+            onClick={() => setMenuOpen(false)}
+            style={{ padding: "8px 0" }}
+          >
+            Settings
+          </NavLink>
+        )}
+
+        {/* Mobile-only auth buttons */}
+        <div className="header-auth-mobile" style={{ display: "flex", gap: "10px", paddingTop: "8px", flexWrap: "wrap" }}>
+          {isLoggedIn ? (
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={handleLogout}
+              style={{ fontSize: "0.9rem" }}
+            >
+              Log out
+            </button>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                className="btn btn-secondary"
+                onClick={() => setMenuOpen(false)}
+                style={{ fontSize: "0.9rem" }}
+              >
+                Sign in
+              </Link>
+              <Link
+                to="/signup"
+                className="btn btn-primary"
+                onClick={() => setMenuOpen(false)}
+                style={{ fontSize: "0.9rem" }}
+              >
+                Sign up
+              </Link>
+            </>
+          )}
+        </div>
       </nav>
     </header>
   );

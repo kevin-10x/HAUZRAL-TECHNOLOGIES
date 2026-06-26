@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 function LogoutPage() {
   const navigate = useNavigate();
+  const { logout } = useAuth();
   const [countdown, setCountdown] = useState(3);
 
   useEffect(() => {
-    // Clear any local user session / state here
-    localStorage.removeItem("user-session");
-    
+    logout();
+
     const interval = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
@@ -20,7 +21,7 @@ function LogoutPage() {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [navigate]);
+  }, [navigate, logout]);
 
   return (
     <section className="section" style={{ textAlign: "center", padding: "80px 20px" }}>
