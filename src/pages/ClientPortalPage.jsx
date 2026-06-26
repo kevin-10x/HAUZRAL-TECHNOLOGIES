@@ -1,8 +1,21 @@
 import React from "react";
+import { Navigate, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import ClientPortalSection from "../components/ClientPortalSection";
 
-function ClientPortalPage() {
+export default function ClientPortalPage() {
+  const { isLoggedIn } = useAuth();
+  const location = useLocation();
+
+  if (!isLoggedIn) {
+    return (
+      <Navigate
+        to="/login"
+        state={{ from: "/client-portal", mode: "signin" }}
+        replace
+      />
+    );
+  }
+
   return <ClientPortalSection />;
 }
-
-export default ClientPortalPage;
