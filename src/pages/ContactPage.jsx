@@ -9,8 +9,8 @@ function ContactPage() {
       <div className="card-grid" style={{ marginTop: "24px" }}>
         <article className="project-card">
           <h3>Start a conversation</h3>
-          <p>hello@hauzraltech.com</p>
-          <p>+254 700 000 000</p>
+          <p>hauzraladamae@gmail.com</p>
+          <p>+254 716606232</p>
         </article>
         <article className="project-card">
           <h3>Need a portal?</h3>
