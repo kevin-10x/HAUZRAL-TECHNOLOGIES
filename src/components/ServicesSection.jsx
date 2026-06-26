@@ -2,16 +2,28 @@ import React from "react";
 
 const services = [
   {
-    title: "Brand Strategy",
-    text: "Positioning, messaging, and experience frameworks that sharpen your edge.",
+    title: "Web Development",
+    text: "Building fast, modern, responsive, and search-optimized web applications tailored to your business goals.",
   },
   {
-    title: "Web Experiences",
-    text: "Fast, elegant websites and product journeys built for conversion and trust.",
+    title: "System Development",
+    text: "Designing scalable, efficient, and robust backend systems and custom software architectures.",
   },
   {
-    title: "Growth Marketing",
-    text: "Performance campaigns, analytics, and storytelling that turn attention into revenue.",
+    title: "AI Development",
+    text: "Integrating intelligent solutions, machine learning datasets, and LLM architectures into digital products.",
+  },
+  {
+    title: "Data Science",
+    text: "Preparing datasets, building machine learning models, and turning complex data into predictive power.",
+  },
+  {
+    title: "Data Analysis",
+    text: "Synthesizing raw operational data into clear, interactive dashboards and strategic insights.",
+  },
+  {
+    title: "Cybersecurity",
+    text: "Securing codebases, protecting user authentication portals, and preventing web system vulnerabilities.",
   },
 ];
 
