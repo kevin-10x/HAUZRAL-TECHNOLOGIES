@@ -4,24 +4,42 @@ export default function AIAssistant() {
   const [message, setMessage] = useState("");
   const [chat, setChat] = useState([]);
 
+  // Safe implementation of the sendMessage function
   const sendMessage = async () => {
-    const res = await fetch("/api/ai/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ message })
-    });
+    try {
+      const res = await fetch("/api/ai/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ message })
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    setChat([
-      ...chat,
-      { role: "user", text: message },
-      { role: "ai", text: data.response }
-    ]);
+      console.log("AI RAW RESPONSE:", data); // 🔥 IMPORTANT DEBUG
 
-    setMessage("");
+      const aiText =
+        data.response ||
+        data.error ||
+        "No response from AI";
+
+      setChat(prev => [
+        ...prev,
+        { role: "user", text: message },
+        { role: "ai", text: aiText }
+      ]);
+
+      setMessage("");
+
+    } catch (error) {
+      console.error("Frontend AI Error:", error);
+
+      setChat(prev => [
+        ...prev,
+        { role: "ai", text: "Error connecting to AI backend" }
+      ]);
+    }
   };
 
   return (

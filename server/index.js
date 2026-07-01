@@ -386,24 +386,21 @@ app.get("/api/auth/google/callback", async (req, res) => {
   }
 });
 
-// 3. AI CHAT ROUTE (Placed before frontend catch-all)
+// 3. AI CHAT ROUTE (Securely handled and explicitly checked)
 app.post("/api/ai/chat", async (req, res) => {
   try {
-    const { message, context } = req.body;
+    const { message } = req.body;
+
+    if (!message) {
+      return res.status(400).json({ error: "Message is required" });
+    }
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
         {
           role: "system",
-          content: `
-You are HAUZRAL AI Assistant.
-
-You help users inside HAUZRAL TECHNOLOGIES platform.
-Be concise, professional, and helpful.
-
-Context: ${context || "General support"}
-          `
+          content: "You are HAUZRAL AI Assistant. You help users inside HAUZRAL TECHNOLOGIES."
         },
         {
           role: "user",
@@ -412,13 +409,24 @@ Context: ${context || "General support"}
       ]
     });
 
-    res.json({
-      response: response.choices[0].message.content
+    const aiText = response.choices?.[0]?.message?.content;
+
+    if (!aiText) {
+      return res.status(500).json({
+        error: "AI returned empty response"
+      });
+    }
+
+    return res.json({
+      response: aiText
     });
 
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "AI request failed" });
+  } catch (err) {
+    console.error("AI ERROR:", err);
+
+    return res.status(500).json({
+      error: "AI request failed"
+    });
   }
 });
 
