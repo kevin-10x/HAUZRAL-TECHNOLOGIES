@@ -1,19 +1,19 @@
 :root {
   color-scheme: light;
-  --bg: #f0f7ff; /* Refreshing light blue background */
-  --bg-soft: #e0f2fe; /* Soft slate/ice blue */
+  --bg: #f2fbf7; /* Refreshing light mint background */
+  --bg-soft: #e6f7ee; /* Soft sage/ice mint */
   --surface: rgba(255, 255, 255, 0.8);
-  --surface-strong: rgba(14, 165, 233, 0.08);
-  --text: #0369a1; /* Deep ocean blue text */
-  --muted: #0284c7; /* Vibrant sky blue for muted text */
-  --accent: #0284c7; /* Primary light blue accent */
-  --accent-2: #38bdf8; /* Brighter sky tint */
-  --accent-3: #7dd3fc; /* Soft pastel ice blue */
-  --border: rgba(14, 165, 233, 0.15);
-  --shadow: 0 12px 40px -4px rgba(14, 165, 233, 0.1), 0 4px 20px -2px rgba(14, 165, 233, 0.05);
-  --bg-grad-1: #f0f7ff;
-  --bg-grad-2: #bae6fd;
-  --bg-grad-3: #e0f2fe;
+  --surface-strong: rgba(16, 185, 129, 0.08);
+  --text: #065f46; /* Deep emerald green text */
+  --muted: #059669; /* Vibrant mint green for muted text */
+  --accent: #059669; /* Primary light green accent */
+  --accent-2: #34d399; /* Brighter mint tint */
+  --accent-3: #a7f3d0; /* Soft pastel ice mint */
+  --border: rgba(16, 185, 129, 0.15);
+  --shadow: 0 12px 40px -4px rgba(16, 185, 129, 0.1), 0 4px 20px -2px rgba(16, 185, 129, 0.05);
+  --bg-grad-1: #f2fbf7;
+  --bg-grad-2: #d1fae5;
+  --bg-grad-3: #e6f7ee;
 }
 
 /* Dark theme overrides — Ultra sleek Cyber Obsidian */
@@ -24,13 +24,13 @@
   --surface-strong: rgba(255, 255, 255, 0.08);
   --text: #f8fafc;
   --muted: #94a3b8;
-  --accent: #818cf8;
-  --accent-2: #22d3ee;
+  --accent: #10b981; /* Updated to emerald for dark mode consistency */
+  --accent-2: #34d399; /* Updated to mint */
   --accent-3: #f472b6;
   --border: rgba(255, 255, 255, 0.06);
-  --shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.5), 0 0 40px 1px rgba(99, 102, 241, 0.04);
+  --shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.5), 0 0 40px 1px rgba(16, 185, 129, 0.04);
   --bg-grad-1: #020617;
-  --bg-grad-2: #070a1e;
+  --bg-grad-2: #051611; /* Slightly greener dark undertone */
   --bg-grad-3: #030712;
 }
 
@@ -51,8 +51,8 @@ body {
   font-family: "Inter", system-ui, -apple-system, sans-serif;
   color: var(--text);
   background:
-    radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.2), transparent 40%),
-    radial-gradient(circle at 90% 80%, rgba(125, 211, 252, 0.15), transparent 45%),
+    radial-gradient(circle at 10% 20%, rgba(52, 211, 153, 0.2), transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(167, 243, 208, 0.15), transparent 45%),
     linear-gradient(135deg, var(--bg-grad-1), var(--bg-grad-2) 50%, var(--bg-grad-3));
   overflow-x: hidden;
 }
@@ -75,13 +75,13 @@ body::after {
 body::before {
   top: -100px;
   left: -100px;
-  background: rgba(56, 189, 248, 0.3);
+  background: rgba(52, 211, 153, 0.3);
 }
 
 body::after {
   bottom: -120px;
   right: -100px;
-  background: rgba(14, 165, 233, 0.2);
+  background: rgba(16, 185, 129, 0.2);
   animation-duration: 24s;
 }
 
@@ -130,7 +130,7 @@ img {
   height: 36px;
   border-radius: 10px;
   background: linear-gradient(135deg, var(--accent), var(--accent-2));
-  box-shadow: 0 8px 20px -4px rgba(14, 165, 233, 0.4);
+  box-shadow: 0 8px 20px -4px rgba(16, 185, 129, 0.4);
 }
 
 .nav-links {
@@ -241,11 +241,11 @@ blockquote,
 .btn-primary {
   background: linear-gradient(135deg, var(--accent), var(--accent-2));
   color: #ffffff;
-  box-shadow: 0 10px 25px -6px rgba(14, 165, 233, 0.35);
+  box-shadow: 0 10px 25px -6px rgba(16, 185, 129, 0.35);
 }
 
 .btn-primary:hover {
-  box-shadow: 0 12px 30px -4px rgba(14, 165, 233, 0.5);
+  box-shadow: 0 12px 30px -4px rgba(16, 185, 129, 0.5);
 }
 
 .btn-secondary {
@@ -255,7 +255,7 @@ blockquote,
 }
 
 .btn-secondary:hover {
-  background: rgba(14, 165, 233, 0.15);
+  background: rgba(16, 185, 129, 0.15);
 }
 
 .dark .btn-secondary:hover {
@@ -407,8 +407,8 @@ blockquote {
 .stage-card:hover,
 .social-link:hover {
   transform: translateY(-6px);
-  border-color: rgba(14, 165, 233, 0.35);
-  box-shadow: 0 28px 60px -12px rgba(14, 165, 233, 0.12), 0 0 30px rgba(14, 165, 233, 0.04);
+  border-color: rgba(16, 185, 129, 0.35);
+  box-shadow: 0 28px 60px -12px rgba(16, 185, 129, 0.12), 0 0 30px rgba(16, 185, 129, 0.04);
 }
 
 .split-section {
@@ -515,7 +515,7 @@ blockquote footer {
 .form-grid textarea:focus {
   outline: none;
   border-color: var(--accent);
-  box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.12);
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.12);
 }
 
 .form-grid textarea {
@@ -604,12 +604,12 @@ blockquote footer {
 }
 
 .stage-pill.in-progress {
-  background: rgba(6, 182, 212, 0.12);
+  background: rgba(52, 211, 153, 0.12);
   color: var(--accent-2);
 }
 
 .stage-pill.queued {
-  background: rgba(14, 165, 233, 0.12);
+  background: rgba(16, 185, 129, 0.12);
   color: var(--accent);
 }
 
@@ -739,7 +739,7 @@ blockquote footer {
   right: 24px;
   width: 56px;
   height: 56px;
-  background: linear-gradient(135deg, var(--accent), #0284c7);
+  background: linear-gradient(135deg, var(--accent), #059669);
   color: white;
   border-radius: 50%;
   display: flex;
@@ -747,7 +747,7 @@ blockquote footer {
   align-items: center;
   font-size: 20px;
   cursor: pointer;
-  box-shadow: 0 12px 30px -4px rgba(14, 165, 233, 0.5);
+  box-shadow: 0 12px 30px -4px rgba(16, 185, 129, 0.5);
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
@@ -774,7 +774,7 @@ blockquote footer {
 
 .ai-widget-header {
   padding: 16px;
-  background: linear-gradient(135deg, var(--accent), #0284c7);
+  background: linear-gradient(135deg, var(--accent), #059669);
   font-weight: 700;
   text-align: center;
   color: white;
@@ -854,7 +854,7 @@ blockquote footer {
 
 @keyframes pulseGlow {
   0%, 100% { box-shadow: var(--shadow); }
-  50% { box-shadow: 0 0 0 1px rgba(14, 165, 233, 0.15), 0 20px 60px rgba(14, 165, 233, 0.15); }
+  50% { box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.15), 0 20px 60px rgba(16, 185, 129, 0.15); }
 }
 
 @keyframes float {
