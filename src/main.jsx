@@ -21,7 +21,7 @@ import { ThemeProvider } from "./components/ThemeProvider";
 import { AuthProvider } from "./context/AuthContext";
 
 // 1. Explicitly import the global AI Assistant Widget component
-import AIWidget from "./components/AIWidget.jsx"; 
+import Widget from "./components/Widget.jsx"; 
 
 function App() {
   return (

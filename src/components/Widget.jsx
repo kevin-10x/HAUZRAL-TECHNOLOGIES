@@ -13,6 +13,7 @@ export default function AIWidget() {
     const userMsg = message;
     setMessage("");
 
+    // Append user message immediately to the screen
     setChat(prev => [...prev, { role: "user", text: userMsg }]);
 
     try {
@@ -38,22 +39,21 @@ export default function AIWidget() {
 
   return (
     <>
-      {/* FLOAT BUTTON */}
-      <div className="ai-fab" onClick={toggle}>
+      {/* TRIGGER FLOATING ACTION BUTTON */}
+      <div className="ai-fab" onClick={toggle} role="button" aria-label="Open AI Assistant">
         🤖
       </div>
 
-      {/* PANEL */}
+      {/* FLYOUT COLLAPSIBLE PANEL */}
       {open && (
         <div className="ai-widget">
           <div className="ai-widget-header">
             HAUZRAL AI
-            <span onClick={toggle} style={{ float: "right", cursor: "pointer" }}>
+            <span onClick={toggle} style={{ float: "right", cursor: "pointer" }} aria-label="Close Panel">
               ✕
             </span>
           </div>
 
-          {/* UPDATED CHAT BODY RENDERING SECTION */}
           <div className="ai-widget-body">
             {chat.length === 0 && (
               <div style={{ opacity: 0.6, fontSize: "12px", textAlign: "center", marginTop: "12px" }}>
@@ -65,7 +65,7 @@ export default function AIWidget() {
               <div 
                 key={i} 
                 className={`bubble ${c.role}`}
-                style={{ whiteSpace: "pre-wrap" }} // Added to maintain sentence line breaks accurately
+                style={{ whiteSpace: "pre-wrap" }}
               >
                 {c.text}
               </div>
@@ -77,7 +77,7 @@ export default function AIWidget() {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Ask anything..."
-              onKeyDown={(e) => e.key === "Enter" && sendMessage()} // Optional helper to send when pressing enter
+              onKeyDown={(e) => e.key === "Enter" && sendMessage()}
             />
             <button onClick={sendMessage}>➤</button>
           </div>
