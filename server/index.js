@@ -431,8 +431,14 @@ app.post("/api/ai/chat", async (req, res) => {
     });
 
   } catch (err) {
-    // Capture absolute underlying stack tracks (including raw response details from Axios/Fetch)
     console.error("🔥 FULL AI ROUTE CRASH:", err?.response?.data || err);
+
+    // 🔥 SMARTER FALLBACK: Handle OpenAI Quota limits gracefully
+    if (err?.code === "insufficient_quota" || err?.status === 429) {
+      return res.json({
+        response: "AI service is temporarily unavailable due to usage limits. Please try again later."
+      });
+    }
 
     return res.status(500).json({
       error: "AI request failed",
