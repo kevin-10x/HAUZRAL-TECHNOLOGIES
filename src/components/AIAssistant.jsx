@@ -4,15 +4,17 @@ export default function AIAssistant() {
   const [message, setMessage] = useState("");
   const [chat, setChat] = useState([]);
 
-  // Safe implementation of the sendMessage function
   const sendMessage = async () => {
+    // 🔥 FIX: block empty or whitespace-only messages
+    if (!message.trim()) return;
+
     try {
       const res = await fetch("/api/ai/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({ message })
+        body: JSON.stringify({ message: message.trim() }) // Send clean payload
       });
 
       const data = await res.json();
@@ -26,7 +28,7 @@ export default function AIAssistant() {
 
       setChat(prev => [
         ...prev,
-        { role: "user", text: message },
+        { role: "user", text: message.trim() },
         { role: "ai", text: aiText }
       ]);
 
@@ -37,6 +39,7 @@ export default function AIAssistant() {
 
       setChat(prev => [
         ...prev,
+        { role: "user", text: message.trim() },
         { role: "ai", text: "Error connecting to AI backend" }
       ]);
     }
@@ -58,6 +61,7 @@ export default function AIAssistant() {
         value={message}
         onChange={(e) => setMessage(e.target.value)}
         placeholder="Ask something..."
+        onKeyDown={(e) => e.key === "Enter" && sendMessage()}
       />
 
       <button onClick={sendMessage}>Send</button>

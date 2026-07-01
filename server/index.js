@@ -386,13 +386,20 @@ app.get("/api/auth/google/callback", async (req, res) => {
   }
 });
 
-// 3. AI CHAT ROUTE (Securely handled and explicitly checked)
+// 3. AI CHAT ROUTE (Upgraded with production error telemetry and assertions)
 app.post("/api/ai/chat", async (req, res) => {
   try {
     const { message } = req.body;
 
-    if (!message) {
+    console.log("Incoming message:", message);
+
+    if (!message || !message.trim()) {
       return res.status(400).json({ error: "Message is required" });
+    }
+
+    if (!process.env.OPENAI_API_KEY) {
+      console.error("🔥 SYSTEM ERROR: OPENAI_API_KEY missing in runtime environment");
+      return res.status(500).json({ error: "Server missing API key configuration" });
     }
 
     const response = await openai.chat.completions.create({
@@ -404,16 +411,18 @@ app.post("/api/ai/chat", async (req, res) => {
         },
         {
           role: "user",
-          content: message
+          content: message.trim()
         }
       ]
     });
 
-    const aiText = response.choices?.[0]?.message?.content;
+    console.log("OpenAI raw response received successfully.");
+
+    const aiText = response?.choices?.[0]?.message?.content;
 
     if (!aiText) {
       return res.status(500).json({
-        error: "AI returned empty response"
+        error: "AI returned empty response object"
       });
     }
 
@@ -422,10 +431,12 @@ app.post("/api/ai/chat", async (req, res) => {
     });
 
   } catch (err) {
-    console.error("AI ERROR:", err);
+    // Capture absolute underlying stack tracks (including raw response details from Axios/Fetch)
+    console.error("🔥 FULL AI ROUTE CRASH:", err?.response?.data || err);
 
     return res.status(500).json({
-      error: "AI request failed"
+      error: "AI request failed",
+      details: err?.message || "Unknown error occurred"
     });
   }
 });
