@@ -5,6 +5,8 @@ export default function AIWidget() {
   const [message, setMessage] = useState("");
   const [chat, setChat] = useState([]);
 
+  const toggle = () => setOpen(prev => !prev);
+
   const sendMessage = async () => {
     if (!message.trim()) return;
 
@@ -13,40 +15,47 @@ export default function AIWidget() {
 
     setChat(prev => [...prev, { role: "user", text: userMsg }]);
 
-    const res = await fetch("/api/ai/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: userMsg })
-    });
+    try {
+      const res = await fetch("/api/ai/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: userMsg })
+      });
 
-    const data = await res.json();
+      const data = await res.json();
 
-    setChat(prev => [
-      ...prev,
-      { role: "ai", text: data.response || data.error }
-    ]);
+      setChat(prev => [
+        ...prev,
+        { role: "ai", text: data.response || data.error }
+      ]);
+    } catch {
+      setChat(prev => [
+        ...prev,
+        { role: "ai", text: "AI connection failed" }
+      ]);
+    }
   };
 
   return (
     <>
-      {/* Floating Button */}
-      <div
-        className="ai-fab"
-        onClick={() => setOpen(!open)}
-      >
+      {/* FLOAT BUTTON */}
+      <div className="ai-fab" onClick={toggle}>
         🤖
       </div>
 
-      {/* Chat Window */}
+      {/* PANEL */}
       {open && (
         <div className="ai-widget">
           <div className="ai-widget-header">
             HAUZRAL AI
+            <span onClick={toggle} style={{ float: "right", cursor: "pointer" }}>
+              ✕
+            </span>
           </div>
 
           <div className="ai-widget-body">
             {chat.map((c, i) => (
-              <div key={i} className={c.role}>
+              <div key={i} className={`bubble ${c.role}`}>
                 {c.text}
               </div>
             ))}
@@ -56,7 +65,7 @@ export default function AIWidget() {
             <input
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="Ask..."
+              placeholder="Ask anything..."
             />
             <button onClick={sendMessage}>➤</button>
           </div>

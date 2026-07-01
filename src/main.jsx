@@ -20,6 +20,9 @@ import AuthCallbackPage from "./pages/AuthCallbackPage";
 import { ThemeProvider } from "./components/ThemeProvider";
 import { AuthProvider } from "./context/AuthContext";
 
+// 1. Import the global AI Assistant Widget
+import AIWidget from "./components/AIWidget"; 
+
 function App() {
   return (
     <AuthProvider>
@@ -43,7 +46,7 @@ function App() {
               <Route path="/auth-callback" element={<AuthCallbackPage />} />
               <Route
                 path="*"
-                element={
+                element = {
                   <section className="section">
                     <h2>Page not found</h2>
                     <p>The requested page could not be found.</p>
@@ -66,7 +69,8 @@ createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
       <App />
+      {/* 2. Mount globally inside the Router context tree */}
+      <AIWidget /> 
     </BrowserRouter>
   </React.StrictMode>,
 );
-
