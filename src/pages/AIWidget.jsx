@@ -53,9 +53,20 @@ export default function AIWidget() {
             </span>
           </div>
 
+          {/* UPDATED CHAT BODY RENDERING SECTION */}
           <div className="ai-widget-body">
+            {chat.length === 0 && (
+              <div style={{ opacity: 0.6, fontSize: "12px", textAlign: "center", marginTop: "12px" }}>
+                Ask me anything about HAUZRAL TECHNOLOGIES...
+              </div>
+            )}
+
             {chat.map((c, i) => (
-              <div key={i} className={`bubble ${c.role}`}>
+              <div 
+                key={i} 
+                className={`bubble ${c.role}`}
+                style={{ whiteSpace: "pre-wrap" }} // Added to maintain sentence line breaks accurately
+              >
                 {c.text}
               </div>
             ))}
@@ -66,6 +77,7 @@ export default function AIWidget() {
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Ask anything..."
+              onKeyDown={(e) => e.key === "Enter" && sendMessage()} // Optional helper to send when pressing enter
             />
             <button onClick={sendMessage}>➤</button>
           </div>
