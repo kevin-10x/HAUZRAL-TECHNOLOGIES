@@ -19,8 +19,6 @@ import SignupPage from "./pages/SignupPage";
 import AuthCallbackPage from "./pages/AuthCallbackPage";
 import { ThemeProvider } from "./components/ThemeProvider";
 import { AuthProvider } from "./context/AuthContext";
-
-// 1. Explicitly import the global AI Assistant Widget component
 import Widget from "./components/Widget.jsx"; 
 
 function App() {
