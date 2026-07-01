@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import OpenAI from "openai"; // 1. Added OpenAI Import
 import {
   createClient,
   createContactSubmission,
@@ -24,6 +25,11 @@ const distPath = path.resolve(__dirname, "../dist");
 const googleClientId = process.env.GOOGLE_CLIENT_ID;
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
 const adminApiKey = process.env.ADMIN_API_KEY;
+
+// 2. Initialize OpenAI instance
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 function getAppUrl(req) {
   const configuredAppUrl = process.env.APP_URL?.trim();
@@ -196,7 +202,6 @@ app.get("/api/clients/:email/projects", async (req, res) => {
   }
 });
 
-// Verify a client account exists by email (used by login flow)
 app.get("/api/clients/:email/verify", async (req, res) => {
   try {
     const email = decodeURIComponent(req.params.email).trim().toLowerCase();
@@ -351,10 +356,8 @@ app.get("/api/auth/google/callback", async (req, res) => {
       });
     }
 
-    const user = await upsertGoogleUser(profile);
+    await upsertGoogleUser(profile);
 
-    // For both signup and signin via Google, ensure a client record exists
-    // so the portal can look up projects by email.
     try {
       await createClient({
         name: profile.name || profile.email,
@@ -362,12 +365,11 @@ app.get("/api/auth/google/callback", async (req, res) => {
         googleId: String(profile.sub),
       });
     } catch (_clientErr) {
-      // Non-fatal: client record may already exist
+      // Non-fatal
     }
 
     const frontendUrl = process.env.CLIENT_URL || process.env.APP_URL || "http://localhost:3000";
 
-    // Build the auth-callback URL so the React app can hydrate its session
     const callbackUrl = new URL(`${frontendUrl}/auth-callback`);
     callbackUrl.searchParams.set("name",    profile.name    || "");
     callbackUrl.searchParams.set("email",   profile.email   || "");
@@ -384,6 +386,43 @@ app.get("/api/auth/google/callback", async (req, res) => {
   }
 });
 
+// 3. AI CHAT ROUTE (Placed before frontend catch-all)
+app.post("/api/ai/chat", async (req, res) => {
+  try {
+    const { message, context } = req.body;
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: `
+You are HAUZRAL AI Assistant.
+
+You help users inside HAUZRAL TECHNOLOGIES platform.
+Be concise, professional, and helpful.
+
+Context: ${context || "General support"}
+          `
+        },
+        {
+          role: "user",
+          content: message
+        }
+      ]
+    });
+
+    res.json({
+      response: response.choices[0].message.content
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "AI request failed" });
+  }
+});
+
+// Frontend Asset Fallbacks
 app.use(express.static(distPath));
 
 app.get("*", (_req, res) => {

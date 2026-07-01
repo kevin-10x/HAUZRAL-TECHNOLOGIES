@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import AIAssistant from "../components/AIAssistant"; // 1. Added import
 
 function AdminDashboard() {
   const { user } = useAuth();
@@ -164,7 +165,6 @@ function AdminDashboard() {
         <div className="card-grid" style={{ marginTop: "16px" }}>
           {projects.map((project) => {
             const stages = project.stages || [];
-            // Default selected stage = current stage_status, falling back to first stage
             const currentStageName =
               updates[project.id]?.stageName ||
               (stages.find((s) => s.name === project.stage_status)
@@ -202,7 +202,6 @@ function AdminDashboard() {
                 </p>
 
                 <div className="stack">
-                  {/* Stage selector — only shows stages that actually exist on this project */}
                   <select
                     value={currentStageName}
                     onChange={(e) =>
@@ -228,7 +227,6 @@ function AdminDashboard() {
                     ))}
                   </select>
 
-                  {/* Note field */}
                   <input
                     value={updates[project.id]?.note || ""}
                     onChange={(e) =>
@@ -298,6 +296,11 @@ function AdminDashboard() {
           </p>
         </div>
       )}
+
+      {/* 2. Embedded AI Assistant directly into the main container */}
+      <div style={{ marginTop: "40px" }}>
+        <AIAssistant />
+      </div>
     </section>
   );
 }
