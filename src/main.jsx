@@ -19,7 +19,8 @@ import SignupPage from "./pages/SignupPage";
 import AuthCallbackPage from "./pages/AuthCallbackPage";
 import { ThemeProvider } from "./components/ThemeProvider";
 import { AuthProvider } from "./context/AuthContext";
-import Widget from "./components/Widget.jsx"; 
+import AIWidget from "./components/Widget.jsx";
+import RoadmapPage from "./pages/RoadmapPage.jsx";
 
 function App() {
   return (
@@ -42,6 +43,7 @@ function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupPage />} />
               <Route path="/auth-callback" element={<AuthCallbackPage />} />
+              <Route path="/roadmap" element={<RoadmapPage />} />
               <Route
                 path="*"
                 element={
@@ -58,17 +60,17 @@ function App() {
           </main>
           <Footer />
         </div>
+        {/* Global floating AI widget — rendered outside page-shell so it's always on top */}
+        <AIWidget />
       </ThemeProvider>
     </AuthProvider>
   );
 }
 
-// 2. Render application and mount the AIWidget explicitly within the Router context tree
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
       <App />
-      <AIWidget />   {/* MUST EXIST HERE TO SHOW GLOBALLY */}
     </BrowserRouter>
   </React.StrictMode>,
 );

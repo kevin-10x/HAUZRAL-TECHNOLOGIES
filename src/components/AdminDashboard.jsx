@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import AIAssistant from "../components/AIAssistant"; // 1. Added import
 
 function AdminDashboard() {
   const { user } = useAuth();
@@ -297,10 +296,7 @@ function AdminDashboard() {
         </div>
       )}
 
-      {/* 2. Embedded AI Assistant directly into the main container */}
-      <div style={{ marginTop: "40px" }}>
-        <AIAssistant />
-      </div>
+
     </section>
   );
 }

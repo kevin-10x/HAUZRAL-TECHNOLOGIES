@@ -1,0 +1,71 @@
+replicaCount: 3
+
+image:
+  repository: hauzral/api
+  tag: "2.0.0"
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8000
+  targetPort: 8000
+
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: api.hauzral.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: hauzral-tls
+      hosts:
+        - api.hauzral.com
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+resources:
+  requests:
+    cpu: "250m"
+    memory: "256Mi"
+  limits:
+    cpu: "1000m"
+    memory: "512Mi"
+
+env:
+  environment: production
+  logLevel: INFO
+  databaseUrlSecret: hauzral-secrets
+  databaseUrlKey: database-url
+  redisUrlSecret: hauzral-secrets
+  redisUrlKey: redis-url
+  adminApiKeySecret: hauzral-secrets
+  adminApiKeyKey: admin-api-key
+  jwtSecretSecret: hauzral-secrets
+  jwtSecretKey: jwt-secret
+  corsOrigins: '["https://hauzral.com"]'
+
+postgresql:
+  enabled: false
+
+redis:
+  enabled: false
+
+prometheus:
+  serviceMonitor:
+    enabled: true
+    interval: 30s
+    path: /metrics
+
+networkPolicy:
+  enabled: true
+  allowExternal: true
+
+rbac:
+  create: true

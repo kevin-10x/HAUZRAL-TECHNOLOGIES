@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hauzral
+  labels:
+    name: hauzral
+    app.kubernetes.io/name: hauzral
+    app.kubernetes.io/part-of: hauzral-technologies

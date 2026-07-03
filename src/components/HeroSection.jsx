@@ -1,6 +1,5 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import AIAssistant from "../components/AIAssistant"; // 1. Added import
 
 function HeroSection() {
   return (
@@ -56,10 +55,7 @@ function HeroSection() {
         </div>
       </div>
 
-      {/* 2. Added Homepage AI Assistant Widget Wrapper */}
-      <div className="homepage-ai-widget" style={{ width: "100%", gridColumn: "1 / -1", marginTop: "40px" }}>
-        <AIAssistant />
-      </div>
+
     </section>
   );
 }

@@ -8,6 +8,7 @@ const publicNavItems = [
   { to: "/about", label: "About" },
   { to: "/services", label: "Services" },
   { to: "/work", label: "Work" },
+  { to: "/roadmap", label: "Roadmap" },
   { to: "/document", label: "CV/Resume" },
   { to: "/contact", label: "Contact" },
 ];

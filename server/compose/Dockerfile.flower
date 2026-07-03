@@ -1,0 +1,22 @@
+FROM python:3.12-slim AS builder
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends gcc libpq-dev && rm -rf /var/lib/apt/lists/*
+
+COPY api/requirements.txt /app/
+RUN pip install --no-cache-dir --prefix=/install -r requirements.txt
+
+FROM python:3.12-slim
+
+WORKDIR /app
+
+RUN adduser --disabled-password --gecos "" --shell /bin/bash appuser
+
+COPY --from=builder /install /usr/local
+
+USER appuser
+
+EXPOSE 5555
+
+CMD ["celery", "-A", "app.services.tasks.celery_app", "flower", "--port=5555", "--broker=redis://redis:6379/1"]

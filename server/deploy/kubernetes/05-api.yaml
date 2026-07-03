@@ -1,0 +1,112 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hauzral-api
+  namespace: hauzral
+  labels:
+    app: hauzral-api
+spec:
+  ports:
+    - port: 8000
+      name: http
+      targetPort: 8000
+  selector:
+    app: hauzral-api
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hauzral-api
+  namespace: hauzral
+  labels:
+    app: hauzral-api
+    version: v2.0.0
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: hauzral-api
+  template:
+    metadata:
+      labels:
+        app: hauzral-api
+        version: v2.0.0
+    spec:
+      serviceAccountName: hauzral-api-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - name: api
+          image: hauzral/api:2.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+              name: http
+          env:
+            - name: ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: hauzral-config
+                  key: environment
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: hauzral-secrets
+                  key: database-url
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: hauzral-secrets
+                  key: redis-url
+            - name: ADMIN_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: hauzral-secrets
+                  key: admin-api-key
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: hauzral-secrets
+                  key: jwt-secret
+            - name: OPENAI_API_KEY
+              valueFrom:
+                configMapKeyRef:
+                  name: hauzral-config
+                  key: openai-api-key
+          envFrom:
+            - configMapRef:
+                name: hauzral-config
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "256Mi"
+            limits:
+              cpu: "1000m"
+              memory: "512Mi"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          volumeMounts:
+            - name: hauzral-uploads
+              mountPath: /app/uploads
+      volumes:
+        - name: hauzral-uploads
+          emptyDir: {}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: hauzral-api-sa
+  namespace: hauzral
