@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 
-function AdminDashboard() {
-  const { user } = useAuth();
+export default function AdminDashboard() {
+   const { user } = useAuth();
 
   // Pre-fill API key if admin signed in via LoginPage (it stored apiKey in user)
   const [adminApiKey, setAdminApiKey] = useState(user?.apiKey || "");
@@ -297,8 +297,6 @@ function AdminDashboard() {
       )}
 
 
-    </section>
-  );
-}
-
-export default AdminDashboard;
+</section>
+   );
+ }

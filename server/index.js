@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import cors from "cors";
 import OpenAI from "openai"; // 1. Added OpenAI Import
 import {
   createClient,
@@ -31,6 +32,15 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+app.disable("x-powered-by");
+app.set("trust proxy", 1);
+app.use(express.json({ limit: "100kb" }));
+
+app.use(cors({
+  origin: process.env.CORS_ORIGINS ? JSON.parse(process.env.CORS_ORIGINS) : ["http://localhost:3000", "http://localhost:5173"],
+  credentials: true,
+}));
+
 function getAppUrl(req) {
   const configuredAppUrl = process.env.APP_URL?.trim();
   if (configuredAppUrl) {
@@ -43,10 +53,6 @@ function getAppUrl(req) {
 
   return `${forwardedProto}://${host}`;
 }
-
-app.disable("x-powered-by");
-app.set("trust proxy", 1);
-app.use(express.json({ limit: "100kb" }));
 
 function requireAdmin(req, res, next) {
   if (!adminApiKey) {

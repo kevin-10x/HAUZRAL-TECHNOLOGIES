@@ -81,8 +81,8 @@ class User(BaseModel):
 
     clients: Mapped[List["Client"]] = relationship(back_populates="user", cascade="all, delete-orphan")
     subscriptions: Mapped[List["Subscription"]] = relationship(back_populates="user", cascade="all, delete-orphan")
-    notifications: Mapped[List["Notification"]] = relationship(back_popups="user", cascade="all, delete-orphan")
-    refresh_tokens: Mapped[List["RefreshToken"]] = relationship(back_popups="user", cascade="all, delete-orphan")
+    notifications: Mapped[List["Notification"]] = relationship(back_populates="user", cascade="all, delete-orphan")
+    refresh_tokens: Mapped[List["RefreshToken"]] = relationship(back_populates="user", cascade="all, delete-orphan")
 
 
 class RefreshToken(BaseModel):
@@ -93,7 +93,7 @@ class RefreshToken(BaseModel):
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     revoked: Mapped[bool] = mapped_column(Boolean, default=False)
 
-    user: Mapped["User"] = relationship(back_popups="refresh_tokens")
+    user: Mapped["User"] = relationship(back_populates="refresh_tokens")
 
 
 class Client(BaseModel):
@@ -110,8 +110,8 @@ class Client(BaseModel):
 
     user: Mapped[Optional["User"]] = relationship(back_populates="clients")
     projects: Mapped[List["Project"]] = relationship(back_populates="client", cascade="all, delete-orphan")
-    invoices: Mapped[List["Invoice"]] = relationship(back_popups="client", cascade="all, delete-orphan")
-    subscriptions: Mapped[List["Subscription"]] = relationship(back_popups="client", cascade="all, delete-orphan")
+    invoices: Mapped[List["Invoice"]] = relationship(back_populates="client", cascade="all, delete-orphan")
+    subscriptions: Mapped[List["Subscription"]] = relationship(back_populates="client", cascade="all, delete-orphan")
 
 
 class Project(BaseModel):
@@ -134,7 +134,7 @@ class Project(BaseModel):
     client: Mapped["Client"] = relationship(back_populates="projects")
     tasks: Mapped[List["Task"]] = relationship(back_populates="project", cascade="all, delete-orphan")
     files: Mapped[List["ProjectFile"]] = relationship(back_populates="project", cascade="all, delete-orphan")
-    invoices: Mapped[List["Invoice"]] = relationship(back_popups="project", cascade="all, delete-orphan")
+    invoices: Mapped[List["Invoice"]] = relationship(back_populates="project", cascade="all, delete-orphan")
 
 
 class Task(BaseModel):
@@ -178,8 +178,8 @@ class Subscription(BaseModel):
     features: Mapped[Optional[Dict[str, Any]]] = mapped_column(JSON, nullable=True)
 
     user: Mapped[Optional["User"]] = relationship(back_populates="subscriptions")
-    client: Mapped[Optional["Client"]] = relationship(back_popups="subscriptions")
-    invoices: Mapped[List["Invoice"]] = relationship(back_popups="subscription", cascade="all, delete-orphan")
+    client: Mapped[Optional["Client"]] = relationship(back_populates="subscriptions")
+    invoices: Mapped[List["Invoice"]] = relationship(back_populates="subscription", cascade="all, delete-orphan")
 
 
 class Invoice(BaseModel):
@@ -197,6 +197,10 @@ class Invoice(BaseModel):
     payment_method: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
     line_items: Mapped[Optional[List[Dict[str, Any]]]] = mapped_column(JSON, nullable=True)
     notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+    subscription: Mapped[Optional["Subscription"]] = relationship(back_populates="invoices")
+    project: Mapped[Optional["Project"]] = relationship(back_populates="invoices")
+    client: Mapped["Client"] = relationship(back_populates="invoices")
 
 
 class ProjectFile(BaseModel):

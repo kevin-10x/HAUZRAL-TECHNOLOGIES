@@ -1,12 +1,13 @@
 import time
 from datetime import datetime, timezone
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text
 from app.database import get_db
 from app.models import ContactSubmission, UserRole
 from app.schemas import ContactCreate, ContactResponse
 from app.services.cache import cache_response
+from app.config import settings
 
 router = APIRouter(prefix="/contact", tags=["contact"])
 
@@ -14,11 +15,8 @@ router = APIRouter(prefix="/contact", tags=["contact"])
 @router.get("/", response_model=dict)
 async def list_contacts(request: Request, db: AsyncSession = Depends(get_db)):
     x_admin_api_key = request.headers.get("x-admin-api-key")
-    if not x_admin_api_key:
-        from app.config import settings
-        if x_admin_api_key != settings.ADMIN_API_KEY:
-            from fastapi import HTTPException
-            raise HTTPException(status_code=401, detail="Unauthorized")
+    if x_admin_api_key != settings.ADMIN_API_KEY:
+        raise HTTPException(status_code=401, detail="Unauthorized")
 
     result = await db.execute(
         text("SELECT id, name, email, message, service_interest, budget_range, status, created_at FROM contact_submissions ORDER BY created_at DESC LIMIT 100")

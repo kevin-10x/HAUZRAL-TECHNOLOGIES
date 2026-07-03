@@ -1,10 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException
+from datetime import datetime, timezone
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, func
+from sqlalchemy import select, func, desc
 from app.database import get_db
-from app.models import User, UserRole
-from app.schemas import AdminDashboardResponse, ClientSummary, ProjectSummary, DashboardStats
+from app.models import User, UserRole, Client, Project, ContactSubmission, Invoice
+from app.schemas import AdminDashboardResponse, ProjectSummary, DashboardStats
 from app.security import get_current_user
+from app.config import settings
+
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -15,11 +18,116 @@ async def require_admin(current_user: User = Depends(get_current_user)):
     return current_user
 
 
+@router.get("/projects", response_model=dict)
+async def list_admin_projects(request: Request, db: AsyncSession = Depends(get_db)):
+    x_admin_api_key = request.headers.get("x-admin-api-key")
+    if x_admin_api_key != settings.ADMIN_API_KEY:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
+    result = await db.execute(
+        select(Project, Client.name.label("client_name"), Client.email.label("client_email"), Client.company)
+        .join(Client, Project.client_id == Client.id)
+        .order_by(desc(Project.created_at))
+    )
+    rows = result.mappings().all()
+    projects = [
+        {
+            "id": r["id"],
+            "title": r["title"],
+            "summary": r["summary"],
+            "budget": r["budget"],
+            "timeline": r["timeline"],
+            "stage_status": r["stage_status"],
+            "stages": r["stages"] or [],
+            "progress": r["progress"],
+            "client_name": r["client_name"],
+            "client_email": r["client_email"],
+            "company": r["company"],
+        }
+        for r in rows
+    ]
+    return {"projects": projects}
+
+
+@router.patch("/projects/{project_id}", response_model=dict)
+async def update_project_stage(
+    project_id: int,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+):
+    x_admin_api_key = request.headers.get("x-admin-api-key")
+    if x_admin_api_key != settings.ADMIN_API_KEY:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
+    form = await request.json()
+    stage_name = form.get("stageName")
+    status = form.get("status", "In progress")
+    note = form.get("note", "")
+
+    if not stage_name:
+        raise HTTPException(status_code=400, detail="Stage name is required")
+
+    result = await db.execute(select(Project).where(Project.id == project_id))
+    project = result.scalar_one_or_none()
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    stages = project.stages or [
+        {"name": "Discovery", "description": "Define goals and success criteria.", "status": "Queued"},
+        {"name": "Planning", "description": "Blueprint and milestones.", "status": "Queued"},
+        {"name": "Design", "description": "UX and UI preparation.", "status": "Queued"},
+        {"name": "Development", "description": "Build and integrate.", "status": "Queued"},
+        {"name": "Testing", "description": "Quality checks and bug fixes.", "status": "Queued"},
+        {"name": "Deployment", "description": "Launch and handover.", "status": "Queued"},
+    ]
+    stage_names = [s["name"] for s in stages]
+    if stage_name not in stage_names:
+        raise HTTPException(status_code=400, detail=f"Invalid stage. Available: {', '.join(stage_names)}")
+
+    stage_index = stage_names.index(stage_name)
+    for i, stage in enumerate(stages):
+        if i < stage_index:
+            stage["status"] = "Completed"
+        elif i == stage_index:
+            stage["status"] = status
+            stage["updatedAt"] = datetime.now(timezone.utc).isoformat()
+            stage["note"] = note
+        else:
+            stage["status"] = "Queued"
+
+    project.stage_status = stage_name
+    project.stages = stages
+    await db.commit()
+    await db.refresh(project)
+
+    return {"project": {"id": project.id, "title": project.title, "stage_status": project.stage_status, "stages": project.stages}}
+
+
+@router.delete("/projects/{project_id}", response_model=dict)
+async def delete_project(
+    project_id: int,
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+):
+    x_admin_api_key = request.headers.get("x-admin-api-key")
+    if x_admin_api_key != settings.ADMIN_API_KEY:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
+    result = await db.execute(select(Project).where(Project.id == project_id))
+    project = result.scalar_one_or_none()
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    await db.delete(project)
+    await db.commit()
+    return {"message": "Project deleted successfully"}
+
+
 @router.get("/dashboard", response_model=AdminDashboardResponse)
 async def admin_dashboard(current_user: User = Depends(require_admin), db: AsyncSession = Depends(get_db)):
-    total_projects = (await db.execute(func.count(select(Project.id).subquery()))).scalar_one()
-    total_clients = (await db.execute(func.count(select(Client.id).subquery()))).scalar_one()
-    total_contacts = (await db.execute(func.count(select(ContactSubmission.id).subquery()))).scalar_one()
+    total_projects = (await db.execute(select(Project.id).with_only_columns(func.count()))).scalar_one()
+    total_clients = (await db.execute(select(Client.id).with_only_columns(func.count()))).scalar_one()
+    total_contacts = (await db.execute(select(ContactSubmission.id).with_only_columns(func.count()))).scalar_one()
     total_revenue = (await db.execute(select(func.coalesce(func.sum(Invoice.amount), 0)).where(Invoice.status == "paid"))).scalar_one()
 
     monthly_revenue = (await db.execute(
@@ -70,7 +178,7 @@ async def admin_dashboard(current_user: User = Depends(require_admin), db: Async
 
 @router.get("/analytics/clients", tags=["admin"])
 async def client_analytics(current_user: User = Depends(require_admin), db: AsyncSession = Depends(get_db)):
-    total = (await db.execute(func.count(select(Client.id).subquery()))).scalar_one()
+    total = (await db.execute(select(Client.id).with_only_columns(func.count()))).scalar_one()
     by_type = (await db.execute(select(Client.project_type, func.count()).group_by(Client.project_type))).mappings().all()
     recent = (await db.execute(
         select(Client.id, Client.name, Client.email, Client.project_type, Client.created_at)

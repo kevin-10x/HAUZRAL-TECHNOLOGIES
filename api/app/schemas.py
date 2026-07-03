@@ -115,6 +115,7 @@ class ProjectUpdate(BaseModel):
 class StageUpdate(BaseModel):
     stage_name: str
     status: Optional[str] = "In progress"
+    note: Optional[str] = ""
 
 
 class TaskCreate(BaseModel):
