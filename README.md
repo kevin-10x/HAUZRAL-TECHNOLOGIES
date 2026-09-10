@@ -1,10 +1,17 @@
-# HAUZRAL-TECHNOLOGIES
+# HAUZRAL Technologies
 
-## Unified platform architecture
+HAUZRAL is a unified platform architecture for multiple business units behind one gateway, one auth layer, and one operational dashboard.
 
-This repo now supports a gateway-driven monorepo layout with one central API gateway, one auth service, one dashboard, and six business-unit services.
+## Overview
 
-### Services
+This repo models a modular multi-service stack with:
+- a central API gateway
+- a JWT auth service
+- a unified dashboard
+- six business-unit services
+- a repeatable startup and verification loop
+
+## Service map
 
 - Gateway: http://localhost:4000
 - Auth: http://localhost:4010
@@ -16,12 +23,29 @@ This repo now supports a gateway-driven monorepo layout with one central API gat
 - Commerce: http://localhost:4005
 - Governance: http://localhost:4006
 
-### Quick start
+## Startup
+
+Use the built-in loop to bootstrap the full stack:
+
+```bash
+cd /home/zral/zral/HAUZRAL-TECHNOLOGIES
+npm install
+npm run dev:all
+```
+
+Stop the stack with:
+
+```bash
+npm run stop:all
+```
+
+## Manual startup
+
+If needed, you can also start services individually:
 
 ```bash
 export PATH="/home/zral/.node/bin:$PATH"
 cd /home/zral/zral/HAUZRAL-TECHNOLOGIES
-npm install
 npm run dev:auth
 npm run dev:gateway
 node apps/education/server.js
@@ -33,26 +57,47 @@ node apps/governance/server.js
 node apps/dashboard/server.js
 ```
 
-### Health checks
+## Verification
 
-```bash
-curl http://localhost:4000/api/health
-curl http://localhost:4010/api/auth/health
-curl http://localhost:4173/
+The loop validates:
+- auth health
+- gateway health
+- all unit service health checks
+- real JWT-protected gateway requests
+
+Example expected output:
+
+```text
+OK    finance-read-status  200  scope=finance:read
+OK    finance-admin-status 200  scope=finance:admin
 ```
 
-### Docker Compose
+## Environment
+
+Copy the example environment file and update values as needed:
+
+```bash
+cp .env.example .env
+```
+
+## Docker
+
+The repo includes a Docker Compose configuration for the same topology:
 
 ```bash
 docker compose up --build
 ```
 
-This starts the gateway, auth, dashboard, and all unit services together.
+> Docker validation depends on Docker being available in the host environment.
 
-### Environment
+## Notes
 
-Copy [.env.example](.env.example) to .env and update the values before running the stack.
+This project is designed around a repeatable engineering loop:
+- spec
+- implement
+- boot
+- verify
+- cleanup
+- repeat
 
-### CI/CD
-
-The repo includes a GitHub Actions workflow in [.github/workflows/ci.yml](.github/workflows/ci.yml) that validates the Node workspace and runs build checks on each push or PR.
+It is meant to keep the stack honest by proving runtime behavior, not just code shape.
