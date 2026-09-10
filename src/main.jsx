@@ -20,7 +20,6 @@ import AuthCallbackPage from "./pages/AuthCallbackPage";
 import { ThemeProvider } from "./components/ThemeProvider";
 import { AuthProvider } from "./context/AuthContext";
 import AIWidget from "./components/Widget.jsx";
-import RoadmapPage from "./pages/RoadmapPage.jsx";
 
 function App() {
   return (
@@ -43,7 +42,6 @@ function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignupPage />} />
               <Route path="/auth-callback" element={<AuthCallbackPage />} />
-              <Route path="/roadmap" element={<RoadmapPage />} />
               <Route
                 path="*"
                 element={
