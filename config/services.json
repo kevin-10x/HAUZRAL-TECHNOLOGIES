@@ -1,0 +1,39 @@
+{
+  "services": {
+    "education": {
+      "url": "http://localhost:4001",
+      "prefix": "/api/education",
+      "repo": "Hauzral-Academy"
+    },
+    "finance": {
+      "url": "http://localhost:4002",
+      "prefix": "/api/finance",
+      "repo": "FINTECH-START-UP"
+    },
+    "healthcare": {
+      "url": "http://localhost:4003",
+      "prefix": "/api/healthcare",
+      "repo": "Phamacare"
+    },
+    "logistics": {
+      "url": "http://localhost:4004",
+      "prefix": "/api/logistics",
+      "repo": "logistics"
+    },
+    "commerce": {
+      "url": "http://localhost:4005",
+      "prefix": "/api/commerce",
+      "repo": "BUSSINESS-STOCK-CONTROL"
+    },
+    "governance": {
+      "url": "http://localhost:4006",
+      "prefix": "/api/governance",
+      "repo": "DIGITAL-GOVERNANCE-STACK"
+    }
+  },
+  "auth": {
+    "url": "http://localhost:4010",
+    "prefix": "/api/auth",
+    "repo": "hauzral-auth"
+  }
+}

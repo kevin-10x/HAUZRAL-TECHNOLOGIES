@@ -1,200 +1,125 @@
+version: '3.9'
+
 services:
-  # === Application Services ===
-  api:
-    build:
-      context: ..
-      dockerfile: server/compose/Dockerfile.api
-    ports:
-      - "8000:8000"
-    environment:
-      - ENVIRONMENT=production
-      - PORT=8000
-      - DATABASE_URL=postgres://hauzral:hauzral_password@postgres:5432/hauzral
-      - DATABASE_SSL=false
-      - REDIS_URL=redis://redis:6379/0
-      - CELERY_BROKER_URL=redis://redis:6379/1
-      - CELERY_RESULT_BACKEND=redis://redis:6379/2
-      - ADMIN_API_KEY=${ADMIN_API_KEY:-hauzral-admin-key}
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - SMTP_USER=${SMTP_USER}
-      - SMTP_PASSWORD=${SMTP_PASSWORD}
-      - CORS_ORIGINS=["http://localhost:3000","http://localhost:5173"]
-    volumes:
-      - hauzral-uploads:/app/uploads
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-sSf", "http://localhost:8000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 15s
-    networks:
-      - hauzral-app
-    restart: unless-stopped
-
-  worker:
-    build:
-      context: ..
-      dockerfile: server/compose/Dockerfile.worker
-    environment:
-      - ENVIRONMENT=production
-      - DATABASE_URL=postgres://hauzral:hauzral_password@postgres:5432/hauzral
-      - DATABASE_SSL=false
-      - REDIS_URL=redis://redis:6379/0
-      - CELERY_BROKER_URL=redis://redis:6379/1
-      - CELERY_RESULT_BACKEND=redis://redis:6379/2
-      - SMTP_USER=${SMTP_USER}
-      - SMTP_PASSWORD=${SMTP_PASSWORD}
-    volumes:
-      - hauzral-uploads:/app/uploads
-    depends_on:
-      - redis
-      - postgres
-    healthcheck:
-      test: ["CMD-SHELL", "celery -A app.services.tasks.celery_app inspect ping 2>&1 | grep -q 'pong'"]
-      interval: 60s
-      timeout: 10s
-      retries: 3
-    networks:
-      - hauzral-app
-    restart: unless-stopped
-
-  beat:
-    build:
-      context: ..
-      dockerfile: server/compose/Dockerfile.beat
-    environment:
-      - ENVIRONMENT=production
-      - CELERY_BROKER_URL=redis://redis:6379/1
-      - CELERY_RESULT_BACKEND=redis://redis:6379/2
-    depends_on:
-      - redis
-      - postgres
-    volumes:
-      - hauzral-beat:/app/.beat
-    networks:
-      - hauzral-app
-    restart: unless-stopped
-
-  # === Data Layer ===
-  postgres:
-    image: postgres:16-alpine
-    container_name: hauzral-postgres
-    environment:
-      POSTGRES_DB: hauzral
-      POSTGRES_USER: hauzral
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-hauzral_password}
-    volumes:
-      - hauzral-postgres:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U hauzral -d hauzral"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - hauzral-app
-    restart: unless-stopped
-
-  redis:
-    image: redis:7-alpine
-    container_name: hauzral-redis
-    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
-    volumes:
-      - hauzral-redis:/data
-    ports:
-      - "6379:6379"
-    healthcheck:
-      test: ["CMD", "redis-cli", "-a", "hauzral@redis123", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    environment:
-      REDIS_PASSWORD: ${REDIS_PASSWORD:-hauzral@redis123}
-    networks:
-      - hauzral-app
-    restart: unless-stopped
-
-  # === Observability (Phase 21) ===
-  prometheus:
-    image: prom/prometheus:v2.47.0
-    container_name: hauzral-prometheus
-    volumes:
-      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
-      - hauzral-prometheus:/prometheus
-    command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
-      - "--storage.tsdb.path=/prometheus"
-      - "--storage.tsdb.retention.time=7d"
-      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
-      - "--web.console.templates=/usr/share/prometheus/consoles"
-      - "--web.enable-lifecycle"
-    ports:
-      - "9090:9090"
-    depends_on:
-      - api
-    networks:
-      - hauzral-app
-    restart: unless-stopped
-
-  grafana:
-    image: grafana/grafana:10.2.0
-    container_name: hauzral-grafana
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
-      - GF_INSTALL_PLUGINS=grafana-piechart-panel
-    volumes:
-      - hauzral-grafana:/var/lib/grafana
-      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
-    ports:
-      - "3001:3000"
-    depends_on:
-      - prometheus
-    networks:
-      - hauzral-app
-    restart: unless-stopped
-
-  # === Frontend (existing Express static server) ===
-  frontend:
+  gateway:
     image: node:20-alpine
-    container_name: hauzral-frontend
     working_dir: /app
+    command: sh -lc "npm install && node apps/gateway/server.js"
     volumes:
-      - ..:/app
-      - /app/node_modules
+      - .:/app
     ports:
-      - "3000:3000"
-    command: ["npm", "run", "dev", "--", "--host"]
+      - "4000:4000"
     environment:
-      - NODE_ENV=development
-      - VITE_API_URL=http://localhost:8000
-      - VITE_APP_URL=http://localhost:3000
+      PORT: 4000
+      JWT_SECRET: ${JWT_SECRET:-dev-only-insecure-secret}
+      NODE_ENV: development
     depends_on:
-      - api
-    networks:
-      - hauzral-app
+      - auth
+      - education
+      - finance
+      - healthcare
+      - logistics
+      - commerce
+      - governance
     restart: unless-stopped
 
-volumes:
-  hauzral-postgres:
-    driver: local
-  hauzral-redis:
-    driver: local
-  hauzral-uploads:
-    driver: local
-  hauzral-grafana:
-    driver: local
-  hauzral-prometheus:
-    driver: local
-  hauzral-beat:
-    driver: local
+  auth:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -lc "npm install && node apps/auth/server.js"
+    volumes:
+      - .:/app
+    ports:
+      - "4010:4010"
+    environment:
+      PORT: 4010
+      JWT_SECRET: ${JWT_SECRET:-dev-only-insecure-secret}
+      NODE_ENV: development
+    restart: unless-stopped
 
-networks:
-  hauzral-app:
-    driver: bridge
-    name: hauzral-app-network
+  dashboard:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -lc "npm install && node apps/dashboard/server.js"
+    volumes:
+      - .:/app
+    ports:
+      - "4173:4173"
+    environment:
+      PORT: 4173
+      NODE_ENV: development
+    depends_on:
+      - gateway
+    restart: unless-stopped
+
+  education:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -lc "npm install && PORT=4001 node apps/education/server.js"
+    volumes:
+      - .:/app
+    ports:
+      - "4001:4001"
+    environment:
+      PORT: 4001
+    restart: unless-stopped
+
+  finance:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -lc "npm install && PORT=4002 node apps/finance/server.js"
+    volumes:
+      - .:/app
+    ports:
+      - "4002:4002"
+    environment:
+      PORT: 4002
+    restart: unless-stopped
+
+  healthcare:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -lc "npm install && PORT=4003 node apps/healthcare/server.js"
+    volumes:
+      - .:/app
+    ports:
+      - "4003:4003"
+    environment:
+      PORT: 4003
+    restart: unless-stopped
+
+  logistics:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -lc "npm install && PORT=4004 node apps/logistics/server.js"
+    volumes:
+      - .:/app
+    ports:
+      - "4004:4004"
+    environment:
+      PORT: 4004
+    restart: unless-stopped
+
+  commerce:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -lc "npm install && PORT=4005 node apps/commerce/server.js"
+    volumes:
+      - .:/app
+    ports:
+      - "4005:4005"
+    environment:
+      PORT: 4005
+    restart: unless-stopped
+
+  governance:
+    image: node:20-alpine
+    working_dir: /app
+    command: sh -lc "npm install && PORT=4006 node apps/governance/server.js"
+    volumes:
+      - .:/app
+    ports:
+      - "4006:4006"
+    environment:
+      PORT: 4006
+    restart: unless-stopped

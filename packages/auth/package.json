@@ -1,0 +1,10 @@
+{
+  "name": "@hauzral/auth",
+  "version": "1.0.0",
+  "type": "commonjs",
+  "main": "index.js",
+  "dependencies": {
+    "@hauzral/shared": "1.0.0",
+    "jsonwebtoken": "^9.0.2"
+  }
+}

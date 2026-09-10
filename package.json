@@ -3,10 +3,19 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "dev": "vite --host 0.0.0.0",
+    "dev:gateway": "node apps/gateway/server.js",
+    "dev:auth": "node apps/auth/server.js",
+    "dev:dashboard": "node apps/dashboard/server.js",
+    "dev:all": "./start-loop.sh",
+    "stop:all": "./stop-loop.sh",
     "build": "vite build",
-    "check": "node --check server/index.js && node --check server/db.js",
+    "check": "node --check server/index.js && node --check server/db.js && node --check apps/gateway/server.js && node --check apps/auth/server.js && node --check apps/dashboard/server.js",
     "preview": "vite preview --host 0.0.0.0",
     "start": "node server/index.js",
     "server:dev": "node --watch server/index.js"
@@ -15,6 +24,8 @@
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^4.21.2",
+    "http-proxy-middleware": "^3.0.0",
+    "jsonwebtoken": "^9.0.2",
     "openai": "^6.45.0",
     "pg": "^8.13.1",
     "react-router-dom": "^7.18.0"
