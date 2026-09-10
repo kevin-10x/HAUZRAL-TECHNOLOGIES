@@ -10,8 +10,10 @@ function HomePage() {
     let cancelled = false;
     async function checkApi() {
       try {
-        const apiBase = import.meta.env.VITE_API_URL || "http://localhost:8000";
-        const res = await fetch(`${apiBase}/health`, { signal: AbortSignal.timeout(4000) });
+        const apiBase = import.meta.env.VITE_API_URL || window.location.origin;
+        const res = await fetch(new URL("/api/health", apiBase).toString(), {
+          signal: AbortSignal.timeout(4000),
+        });
         if (!cancelled) setApiConnected(res.ok);
       } catch {
         if (!cancelled) setApiConnected(false);
